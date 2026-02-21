@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMMC - 國際策略管理 Strategic Management of MNCs</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bcg: {
+                            green: '#177a46',
+                            dark: '#0a0a0a',
+                            card: '#141414',
+                            light: '#f9fafb',
+                            textDark: '#f3f4f6',
+                            accent: '#10b981',
+                            gold: '#d4af37'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slight': 'bounce-slight 2s infinite',
+                        'confetti': 'confetti 3s ease-out forwards',
+                        'shimmer': 'shimmer 2s infinite linear',
+                    },
+                    keyframes: {
+                        'bounce-slight': {
+                            '0%, 100%': { transform: 'translateY(-5%)' },
+                            '50%': { transform: 'translateY(0)' },
+                        },
+                        'shimmer': {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        body, header, footer, div, span, p, h1, h2, h3, button, nav, a, li, ul, label, section, main {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .custom-checkbox:checked + div {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* 慶祝用紙屑特效 */
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            top: 0;
+            opacity: 0;
+            z-index: 110;
+        }
+
+        /* 按鈕流光 */
+        .btn-shimmer {
+            background: linear-gradient(90deg, #177a46 0%, #10b981 50%, #177a46 100%);
+            background-size: 200% 100%;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(23, 122, 70, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-bcg-light dark:bg-bcg-dark text-gray-900 dark:text-bcg-textDark font-sans selection:bg-bcg-green selection:text-white overflow-x-hidden">
+
+    <!-- 成功彈窗 (精緻 CRM 版) / Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-500">
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        
+        <div class="bg-white dark:bg-bcg-card max-w-md w-full rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 relative text-center">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-bcg-green/10 to-transparent pointer-events-none"></div>
+            
+            <div class="p-10 relative z-10">
+                <div class="relative w-24 h-24 mx-auto mb-10">
+                    <div class="absolute inset-0 bg-bcg-green/20 rounded-full animate-ping"></div>
+                    <div class="relative w-24 h-24 bg-gradient-to-tr from-bcg-green to-bcg-accent rounded-full flex items-center justify-center text-white text-4xl shadow-lg shadow-bcg-green/40">
+                        <i class="fas fa-award"></i>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl md:text-4xl font-black mb-4 text-gray-900 dark:text-white tracking-tight">
+                    <span class="lang-en">Mission Accomplished!</span>
+                    <span class="lang-zh hidden">任務順利達成！</span>
+                </h3>
+                
+                <p class="text-base text-gray-600 dark:text-gray-300 mb-10 leading-relaxed font-medium">
+                    <span class="lang-en">You've completed all pre-course tasks. You are now ready to begin the Strategic Management journey.</span>
+                    <span class="lang-zh hidden">您已完成所有課前任務，現在可以正式開啟國際策略管理的學習旅程。</span>
+                </p>
+
+                <div class="space-y-4">
+                    <a href="https://ncnulolotas.github.io/1142smmcbache.github.io/" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn-shimmer animate-shimmer block w-full py-5 bg-bcg-green text-white font-black text-lg rounded-2xl shadow-2xl shadow-bcg-green/40 transition-all hover:scale-[1.03] active:scale-95 uppercase tracking-widest text-center">
+                        <span class="lang-en">Access Course Website</span>
+                        <span class="lang-zh hidden">進入課程入口網站</span>
+                    </a>
+                    
+                    <button onclick="closeModal()" class="block w-full py-2 text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition tracking-widest uppercase text-center">
+                        <span class="lang-en">Return to Hub</span>
+                        <span class="lang-zh hidden">繼續留在中心</span>
+                    </button>
+                </div>
+            </div>
+            <div class="h-2 w-full bg-gradient-to-r from-bcg-green via-bcg-gold to-bcg-green opacity-80"></div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="fixed w-full top-0 z-50 h-16 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-black/80 glass border-b border-gray-200 dark:border-gray-800 transition-all">
+        <div class="flex items-center space-x-4">
+            <button id="menu-btn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="cursor-pointer flex items-center group border-r border-gray-200 dark:border-gray-800 pr-4 md:pr-6">
+                <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-bcg-green transition-colors">SMMC</span>
+            </div>
+            <div class="hidden md:block text-left">
+                <p class="text-[11px] font-bold text-bcg-green uppercase tracking-widest leading-none mb-1">Executive Course</p>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Strategic Management of Multinational Corporations</p>
+            </div>
+        </div>
+
+        <h1 id="page-title" class="absolute left-1/2 transform -translate-x-1/2 text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+            <span class="lang-en">Overview</span>
+            <span class="lang-zh hidden">綜覽</span>
+        </h1>
+
+        <div class="flex items-center space-x-2">
+            <button id="audio-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-bcg-green hover:bg-bcg-green/10 transition group" title="Audio Guide">
+                <i class="fas fa-headphones text-lg group-hover:scale-110 transition"></i>
+            </button>
+            <button id="theme-toggle" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-yellow-500 hover:bg-yellow-500/10 transition">
+                <i class="fas fa-sun text-lg"></i>
+            </button>
+            <button id="lang-toggle" class="px-3 h-10 text-[11px] font-bold border border-gray-200 dark:border-gray-700 rounded-xl hover:border-bcg-green hover:text-bcg-green transition whitespace-nowrap bg-white dark:bg-transparent">
+                EN / 繁
+            </button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <div id="overlay" class="fixed inset-0 bg-black/60 z-[60] hidden backdrop-blur-sm transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 w-72 h-full bg-white dark:bg-bcg-card z-[70] transform -translate-x-full shadow-2xl flex flex-col border-r border-gray-200 dark:border-gray-800">
+        <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <span class="text-xs font-black tracking-[0.3em] text-gray-400 uppercase font-sans text-left">
+                <span class="lang-en">Navigation</span><span class="lang-zh hidden">導覽選單</span>
+            </span>
+            <button onclick="toggleSidebar()" class="text-gray-400 hover:text-bcg-green transition"><i class="fas fa-times"></i></button>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-2 text-left">
+            <a href="javascript:void(0)" onclick="switchSection('overview')" id="nav-overview" class="flex items-center p-4 rounded-xl bg-bcg-green/10 text-bcg-green font-bold transition">
+                <i class="fas fa-th-large w-6 mr-3"></i>
+                <span class="lang-en">Overview</span><span class="lang-zh hidden">綜覽</span>
+            </a>
+            <a href="javascript:void(0)" onclick="switchSection('w1w2')" id="nav-w1w2" class="flex items-center p-4 rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                <i class="fas fa-compass w-6 mr-3"></i>
+                <div class="flex-1 text-left">
+                    <span class="lang-en">Orientation</span><span class="lang-zh hidden">課程定位</span>
+                    <p class="text-[10px] text-gray-400 font-normal">W1</p>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            </a>
+
+            <div class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">
+                <span class="lang-en">Future Roadmap</span><span class="lang-zh hidden">未來路線圖</span>
+            </div>
+            <div class="space-y-1 opacity-40">
+                <div class="flex items-start p-4 rounded-xl text-gray-400">
+                    <i class="fas fa-microchip w-6 mr-3 mt-1 text-center"></i> 
+                    <div class="flex-1 text-[13px] leading-snug font-semibold">
+                        <span class="lang-en">W2: Common Ground on Learning & Digital Tools</span>
+                        <span class="lang-zh hidden">W2: 學習共識、生成式 AI 與數位工具應用</span>
+                    </div>
+                </div>
+                <div class="flex items-start p-4 rounded-xl text-gray-400">
+                    <i class="fas fa-briefcase w-6 mr-3 mt-1 text-center"></i> 
+                    <div class="flex-1 text-[13px] leading-snug font-semibold">
+                        <span class="lang-en">W3: Product Manager (PM), JD, & Term Project</span>
+                        <span class="lang-zh hidden">W3: 產品經理 (PM)、職缺說明 (JD) 與期末專案 (TP)</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="p-6 bg-gray-50 dark:bg-black/20 border-t border-gray-100 dark:border-gray-800 text-left">
+            <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-full bg-bcg-green/20 flex items-center justify-center text-bcg-green">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">
+                        <span class="lang-en">Next Session</span><span class="lang-zh hidden">下堂課程</span>
+                    </p>
+                    <p class="text-xs font-bold text-gray-900 dark:text-white">Feb 23, 02:30 PM</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 pt-24 pb-24 px-6 max-w-5xl mx-auto w-full text-left">
+        <!-- SECTION: OVERVIEW -->
+        <section id="section-overview" class="space-y-8 animate-in fade-in duration-500">
+            <header class="hero-gradient p-8 rounded-3xl border border-bcg-green/20">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div class="flex-1 text-left">
+                        <h2 class="text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tighter">
+                            <span class="lang-en">Strategic Management of MNCs</span>
+                            <span class="lang-zh hidden">國際策略管理</span>
+                        </h2>
+                        <p class="text-gray-500 dark:text-gray-400 max-w-xl leading-relaxed text-base md:text-lg text-left">
+                            <span class="lang-en">A high-impact EMI course focusing on the strategic challenges and management paradigms of Multinational Corporations in a globalized economy.</span>
+                            <span class="lang-zh hidden">一門專注於全球化經濟背景下，跨國公司面臨的策略挑戰與管理典範的高強度全英授課課程。</span>
+                        </p>
+                    </div>
+                    <!-- 課程基本資料卡片 -->
+                    <div class="bg-white dark:bg-white/5 p-8 rounded-3xl border border-gray-200 dark:border-white/10 glass shadow-2xl min-w-[300px] md:min-w-[340px]">
+                        <p class="text-xs font-black text-bcg-green uppercase tracking-[0.2em] mb-1 text-left">
+                            <span class="lang-en">Course Info</span><span class="lang-zh hidden">課程資訊</span>
+                        </p>
+                        <p class="text-xs text-gray-400 mb-8 font-medium text-left">
+                            <span class="lang-en">Essential Course Data</span><span class="lang-zh hidden">本次課程基本資料</span>
+                        </p>
+                        <div class="space-y-6 text-left">
+                            <div class="flex items-start">
+                                <span class="w-6 text-bcg-green text-center mr-5 mt-1"><i class="far fa-calendar-alt text-xl"></i></span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1"><span class="lang-en">Date</span><span class="lang-zh hidden">上課日期</span></span>
+                                    <span class="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight"><span class="lang-en">Mondays</span><span class="lang-zh hidden">每週一</span></span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-6 text-bcg-green text-center mr-5 mt-1"><i class="far fa-clock text-xl"></i></span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1"><span class="lang-en">Time</span><span class="lang-zh hidden">上課時間</span></span>
+                                    <span class="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight">14:30 – 17:30</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-6 text-bcg-green text-center mr-5 mt-1"><i class="fas fa-map-marker-alt text-xl"></i></span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1"><span class="lang-en">Location</span><span class="lang-zh hidden">上課地點</span></span>
+                                    <span class="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight"><span class="lang-en">Mgmt B15</span><span class="lang-zh hidden">管理學院 B15 教室</span></span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-6 text-bcg-green text-center mr-5 mt-1"><i class="fas fa-user-tie text-xl"></i></span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1"><span class="lang-en">Instructor</span><span class="lang-zh hidden">授課老師</span></span>
+                                    <span class="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight"><span class="lang-en">Prof. Shihmin Lo</span><span class="lang-zh hidden">駱世民 教授</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <a href="https://drive.google.com/file/d/18LnOz4Hc5j0DJm-SxKTFFv8VyX5rA1Pe/view?usp=sharing" target="_blank" class="group bg-white dark:bg-bcg-card p-8 rounded-3xl border border-gray-200 dark:border-gray-800 hover:border-bcg-green transition-all shadow-sm hover:shadow-xl text-left">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-bcg-green/10 text-bcg-green flex items-center justify-center text-2xl group-hover:scale-110 transition duration-500">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:translate-x-1 transition duration-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2"><span class="lang-en">Course Syllabus</span><span class="lang-zh hidden">課程大綱</span></h3>
+                    <p class="text-sm text-gray-500 mb-6 h-10 leading-relaxed text-left">
+                        <span class="lang-en">Review grading criteria, weekly schedule, and academic expectations.</span>
+                        <span class="lang-zh hidden">詳閱評分標準、每週進度表與課堂預期管理。</span>
+                    </p>
+                    <span class="text-[11px] font-black uppercase text-bcg-green tracking-widest border-b-2 border-bcg-green/30 pb-0.5 group-hover:border-bcg-green transition-all text-left"><span class="lang-en">Read Document</span><span class="lang-zh hidden">閱讀文件</span></span>
+                </a>
+
+                <a href="https://ncnulolotas.github.io/1142smmcbache.github.io/" target="_blank" class="group bg-white dark:bg-bcg-card p-8 rounded-3xl border border-gray-200 dark:border-gray-800 hover:border-bcg-green transition-all shadow-sm hover:shadow-xl text-left">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-500">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <i class="fas fa-external-link-alt text-gray-300 group-hover:scale-110 transition duration-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-left">
+                        <span class="lang-en">Course Website</span>
+                        <span class="lang-zh hidden">課程入口網站</span>
+                    </h3>
+                    <p class="text-sm text-gray-500 mb-6 h-10 leading-relaxed text-left text-left">
+                        <span class="lang-en">Central hub for materials, assignment links, and announcements.</span>
+                        <span class="lang-zh hidden">所有教材、作業繳交連結與最新公告的中心平台。</span>
+                    </p>
+                    <span class="text-[11px] font-black uppercase text-blue-500 tracking-widest border-b-2 border-blue-500/30 pb-0.5 group-hover:border-blue-500 transition-all text-left"><span class="lang-en">Visit Portal</span><span class="lang-zh hidden">造訪入口</span></span>
+                </a>
+            </div>
+        </section>
+
+        <!-- ORIENTATION SECTION -->
+        <section id="section-w1w2" class="hidden space-y-8 animate-in slide-in-from-bottom-4 duration-500 text-left text-left">
+            <div class="flex items-center space-x-4 mb-4 text-left">
+                <div class="h-10 w-1.5 bg-bcg-green rounded-full shadow-lg shadow-bcg-green/20"></div>
+                <h2 class="text-3xl font-black tracking-tight text-left text-gray-900 dark:text-white">
+                    <span class="lang-en">Orientation</span><span class="lang-zh hidden">課程定位</span>
+                </h2>
+            </div>
+            <div class="bg-red-500/5 dark:bg-red-900/10 border border-red-500/20 rounded-[2rem] p-10 relative overflow-hidden text-left shadow-lg text-left">
+                <div class="absolute top-0 right-0 p-12 opacity-5 rotate-12 scale-150"><i class="fas fa-shield-alt text-9xl text-red-500"></i></div>
+                <h3 class="text-red-500 font-black text-xs uppercase tracking-[0.3em] mb-8 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-3 text-lg"></i> 
+                    <span class="lang-en">Survival Guide & Readiness</span><span class="lang-zh hidden">生存指南與課前準備</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 text-left text-left text-left">
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-xl bg-red-500 text-white flex items-center justify-center text-xs font-black mt-1 mr-5 shadow-lg shadow-red-500/20 shrink-0">01</div>
+                            <div class="flex-1 text-left text-left">
+                                <p class="font-black text-gray-900 dark:text-white uppercase tracking-wider text-sm mb-1"><span class="lang-en">English Mastery (B1+)</span><span class="lang-zh hidden">英語能力要求 (B1+)</span></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed text-left">
+                                    <span class="lang-en">This is an EMI environment. Silence is not an option. Expect weekly oral interaction.</span>
+                                    <span class="lang-zh hidden">這是全英授課環境。沉默不是選項，請準備好每週進行英語口頭互動。</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start text-left text-left text-left">
+                            <div class="w-8 h-8 rounded-xl bg-red-500 text-white flex items-center justify-center text-xs font-black mt-1 mr-5 shadow-lg shadow-red-500/20 shrink-0">02</div>
+                            <div class="flex-1 text-left text-left text-left">
+                                <p class="font-black text-gray-900 dark:text-white uppercase tracking-wider text-sm mb-1 text-left text-left"><span class="lang-en">Commitment Expectations</span><span class="lang-zh hidden">承諾投入度</span></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed text-left text-left text-left">
+                                    <span class="lang-en">Groups are permanent. Absences on Feb 23 must be reported via Moodle in advance.</span>
+                                    <span class="lang-zh hidden">分組是固定且長期的。2 月 23 日若缺席，須提前於 Moodle 系統請假。</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6 text-left text-left text-left text-left text-left">
+                        <div class="flex items-start text-left text-left">
+                            <div class="w-8 h-8 rounded-xl bg-red-500 text-white flex items-center justify-center text-xs font-black mt-1 mr-5 shadow-lg shadow-red-500/20 shrink-0">03</div>
+                            <div class="flex-1 text-left text-left text-left text-left">
+                                <p class="font-black text-gray-900 dark:text-white uppercase tracking-wider text-sm mb-1 text-left text-left text-left text-left text-left"><span class="lang-en">Case Analysis Readiness</span><span class="lang-zh hidden">案例分析準備感</span></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed text-left text-left text-left text-left">
+                                    <span class="lang-en">Prepare to dive into complex multinational case studies. Critical thinking is required.</span>
+                                    <span class="lang-zh hidden">準備好深入探討複雜的跨國企業案例。此課程高度要求批判性思維。</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-red-500/10 dark:bg-black/40 rounded-2xl border border-red-500/10 backdrop-blur-sm text-left text-left">
+                            <p class="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-2 text-left text-left text-left"><span class="lang-en">Strategic Notice</span><span class="lang-zh hidden">戰略建議</span></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300 italic leading-relaxed text-left text-left text-left">
+                                <span class="lang-en">If the workload exceeds your capacity, please drop early to benefit students on the waitlist.</span>
+                                <span class="lang-zh hidden">若您覺得課業負荷過重，請務必儘早退選，以便讓候補同學及早加入。</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-bcg-card rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden text-left text-left">
+                <div class="p-8 md:p-10 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="text-left text-left text-left text-left">
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-1 text-left text-left text-left"><span class="lang-en">Mission: Week 1 Prep</span><span class="lang-zh hidden">任務：第一週課前準備</span></h3>
+                        <p class="text-sm text-gray-500 text-left text-left text-left"><span class="lang-en">Required actions before the first bell.</span><span class="lang-zh hidden">開學第一堂課前須完成的事項。</span></p>
+                    </div>
+                    <div class="flex text-left text-left text-left">
+                        <span class="text-xs font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-5 py-2 rounded-full border border-red-500/10 whitespace-nowrap text-left">
+                            <span class="lang-en">Deadline: Feb 22</span><span class="lang-zh hidden">截止日期：2 月 22 日</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-gray-800" id="checklist-container">
+                    <!-- 任務 1：駱老師個人簡介 -->
+                    <label class="flex items-center p-8 md:p-10 hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer group text-left text-left">
+                        <input type="checkbox" class="custom-checkbox w-8 h-8 rounded-xl border-2 border-gray-300 dark:border-gray-700 checked:bg-bcg-green checked:border-bcg-green transition appearance-none relative checked:before:content-['✓'] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:font-black before:text-xl shrink-0 shadow-inner text-left">
+                        <div class="ml-8 flex-1 text-left text-left">
+                            <span class="block text-xl font-black group-hover:text-bcg-green transition duration-500 text-left text-left text-left text-left text-left"><span class="lang-en">1. Prof. Lolo’s personal introduction</span><span class="lang-zh hidden">1. 駱老師個人簡介</span></span>
+                            <p class="text-sm text-gray-500 mb-4 leading-relaxed text-left text-left text-left text-left text-left text-left"><span class="lang-en">Get to know your instructor's background and teaching philosophy.</span><span class="lang-zh hidden">進一步瞭解授課教授的背景與教學理念。</span></p>
+                            <a href="https://drive.google.com/file/d/1H0UeqOG2sax8frL12roHHTeDqqh2a6x1/view?usp=sharing" target="_blank" class="inline-flex items-center text-xs font-black uppercase text-blue-500 tracking-widest bg-blue-500/5 px-4 py-2 rounded-lg border border-blue-500/10 hover:bg-blue-500 hover:text-white transition-all text-left text-left text-left text-left text-left"><i class="fas fa-link mr-2"></i> <span class="lang-en">View Intro</span><span class="lang-zh hidden">查看簡介</span></a>
+                        </div>
+                    </label>
+                    <!-- 任務 2：課前學習內容 -->
+                    <label class="flex items-center p-8 md:p-10 hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer group text-left text-left">
+                        <input type="checkbox" class="custom-checkbox w-8 h-8 rounded-xl border-2 border-gray-300 dark:border-gray-700 checked:bg-bcg-green checked:border-bcg-green transition appearance-none relative checked:before:content-['✓'] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:font-black before:text-xl shrink-0 shadow-inner text-left text-left text-left">
+                        <div class="ml-8 flex-1 text-left text-left text-left">
+                            <span class="block text-xl font-black group-hover:text-bcg-green transition duration-500 text-left text-left text-left text-left text-left text-left text-left text-left"><span class="lang-en">2. Pre-Course Content</span><span class="lang-zh hidden">2. 課前學習內容</span></span>
+                            <p class="text-sm text-gray-500 mb-4 leading-relaxed text-left text-left text-left text-left text-left text-left text-left text-left"><span class="lang-en">Review introduction to MNC structures and global market trends.</span><span class="lang-zh hidden">回顧跨國企業組織架構與全球市場趨勢簡介。</span></p>
+                            <div class="flex text-left text-left text-left text-left"><a href="https://youtu.be/RVeT7DyKTYE" target="_blank" class="inline-flex items-center text-xs font-black uppercase text-red-500 tracking-widest bg-red-500/5 px-4 py-2 rounded-lg border border-red-500/10 hover:bg-red-500 hover:text-white transition-all text-left text-left text-left"><i class="fab fa-youtube mr-2 text-left text-left"></i> <span class="lang-en">Intro Video</span><span class="lang-zh hidden">導論影片</span></a></div>
+                        </div>
+                    </label>
+                    <!-- 任務 3：個人資料表單 -->
+                    <label class="flex items-center p-8 md:p-10 hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer group text-left text-left">
+                        <input type="checkbox" class="custom-checkbox w-8 h-8 rounded-xl border-2 border-gray-300 dark:border-gray-700 checked:bg-bcg-green checked:border-bcg-green transition appearance-none relative checked:before:content-['✓'] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:font-black before:text-xl shrink-0 shadow-inner text-left">
+                        <div class="ml-8 flex-1 text-left text-left">
+                            <span class="block text-xl font-black group-hover:text-bcg-green transition duration-500 text-left text-left text-left text-left text-left text-left text-left text-left"><span class="lang-en">3. Personal Info Form</span><span class="lang-zh hidden">3. 填寫個人資料表單</span></span>
+                            <p class="text-sm text-gray-500 mb-4 leading-relaxed text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left"><span class="lang-en">Crucial for group matching and background assessment.</span><span class="lang-zh hidden">此表單對分組與背景評估至關重要。</span></p>
+                            <a href="https://forms.gle/ot6hzjLQKbAefjRZ7" target="_blank" class="inline-flex items-center text-xs font-black uppercase text-blue-500 tracking-widest bg-blue-500/5 px-4 py-2 rounded-lg border border-blue-500/10 hover:bg-blue-500 hover:text-white transition-all text-left text-left text-left text-left text-left"><i class="fas fa-link mr-2 text-left"></i> <span class="lang-en">Fill Form</span><span class="lang-zh hidden">填寫表單</span></a>
+                        </div>
+                    </label>
+                    <!-- 任務 4：預先分組 -->
+                    <label class="flex items-center p-8 md:p-10 hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer group text-left text-left">
+                        <input type="checkbox" class="custom-checkbox w-8 h-8 rounded-xl border-2 border-gray-300 dark:border-gray-700 checked:bg-bcg-green checked:border-bcg-green transition appearance-none relative checked:before:content-['✓'] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:text-white before:font-black before:text-xl shrink-0 shadow-inner text-left text-left text-left text-left text-left text-left">
+                        <div class="ml-8 flex-1 text-left text-left text-left text-left text-left">
+                            <span class="block text-xl font-black group-hover:text-bcg-green transition duration-500 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left"><span class="lang-en">4. Pre-grouping</span><span class="lang-zh hidden">4. 預先分組</span></span>
+                            <p class="text-sm text-gray-500 leading-relaxed text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">
+                                <span class="lang-en">Coordinate with peers early. Ideally 6 people per group, aiming for 6-8 groups total.</span>
+                                <span class="lang-zh hidden">可以預先分組，以 6 個人一組為原則。全課程預計招收 6-8 組。</span>
+                            </p>
+                        </div>
+                    </label>
+                </div>
+                <!-- 進度條區域 -->
+                <div class="p-10 bg-gray-50 dark:bg-black/40 text-left text-left text-left text-left text-left text-left text-left">
+                    <div class="flex items-center justify-between mb-6 text-left text-left text-left text-left">
+                        <div class="flex items-center text-left text-left text-left text-left text-left text-left text-left text-left">
+                            <i class="fas fa-unlock-alt text-bcg-green mr-3 text-left text-left"></i>
+                            <span class="text-sm font-black text-gray-500 uppercase tracking-[0.2em] text-left text-left">
+                                <span class="lang-en">Progress Unlock Status</span><span class="lang-zh hidden">進度條解鎖</span>
+                            </span>
+                        </div>
+                        <span id="progress-percent" class="text-2xl font-black text-bcg-green tabular-nums text-left text-left text-left text-left">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-white/5 h-4 rounded-2xl overflow-hidden p-1 border border-gray-300 dark:border-gray-800 shadow-inner text-left text-left text-left text-left text-left text-left text-left">
+                        <div id="progress-bar" class="h-full bg-gradient-to-r from-bcg-green via-bcg-accent to-bcg-gold rounded-full transition-all duration-1000 ease-out shadow-lg text-left text-left text-left text-left"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="fixed bottom-0 w-full min-h-[5rem] bg-white/80 dark:bg-black/80 glass border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between px-6 py-4 md:py-0 md:px-10 z-[50]">
+        <div class="flex flex-col mb-2 md:mb-0 text-left text-left text-left text-left text-left text-left text-left text-left">
+            <span class="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mb-0.5 text-left text-left text-left text-left">v2026.Q1 | <a href="https://www.ibs.ncnu.edu.tw/" target="_blank" class="hover:text-bcg-green transition-colors text-left text-left text-left">NCNU IBS</a></span>
+            <a href="https://www.ibs.ncnu.edu.tw/index.php/faculty/tenured-professor/299-smlo" target="_blank" class="text-[11px] font-bold text-gray-600 dark:text-gray-400 hover:text-bcg-green transition-colors underline-offset-4 hover:underline decoration-bcg-green/30 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">
+                <span class="lang-en">Inst. Prof. Shihmin Lo</span><span class="lang-zh hidden">授課教授：駱世民</span>
+            </a>
+        </div>
+        <div class="flex items-center space-x-4 md:space-x-8 text-left text-left text-left text-left text-left">
+            <button onclick="openMail('s112212015@mail1.ncnu.edu.tw')" class="flex items-center space-x-3 group cursor-pointer hover:opacity-80 transition-all bg-transparent border-none p-0 text-left outline-none text-left text-left text-left text-left text-left">
+                <div class="w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs font-black uppercase tracking-tighter border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white group-hover:scale-110 transition-all duration-500 text-left text-left text-left text-left">TW</div>
+                <div class="flex flex-col text-left text-left text-left text-left text-left text-left text-left text-left text-left">
+                    <span class="text-[10px] font-black text-gray-800 dark:text-gray-200 leading-none mb-1 uppercase tracking-tighter text-left text-left text-left text-left text-left"><span class="lang-en">Tina Wang</span><span class="lang-zh hidden">王怡婷</span></span>
+                    <span class="text-[9px] text-bcg-green font-black opacity-80 group-hover:opacity-100 flex items-center tracking-widest uppercase text-left text-left text-left text-left text-left text-left"><i class="far fa-envelope mr-1.5 text-left text-left"></i> Gmail</span>
+                </div>
+            </button>
+            <button onclick="openMail('s113121016@mail1.ncnu.edu.tw')" class="flex items-center space-x-3 group cursor-pointer hover:opacity-80 transition-all bg-transparent border-none p-0 text-left outline-none text-left text-left text-left text-left text-left">
+                <div class="w-11 h-11 rounded-2xl bg-bcg-green/10 text-bcg-green flex items-center justify-center text-xs font-black uppercase tracking-tighter border border-bcg-green/20 group-hover:bg-bcg-green group-hover:text-white group-hover:scale-110 transition-all duration-500 text-left text-left text-left text-left">TL</div>
+                <div class="flex flex-col text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">
+                    <span class="text-[10px] font-black text-gray-800 dark:text-gray-200 leading-none mb-1 uppercase tracking-tighter text-left text-left text-left text-left text-left text-left"><span class="lang-en">Tina Lin</span><span class="lang-zh hidden">林庭伃</span></span>
+                    <span class="text-[9px] text-bcg-green font-black opacity-80 group-hover:opacity-100 flex items-center tracking-widest uppercase text-left text-left text-left text-left text-left text-left text-left"><i class="far fa-envelope mr-1.5 text-left text-left"></i> Gmail</span>
+                </div>
+            </button>
+        </div>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hidden lg:flex w-10 h-10 rounded-full border border-gray-200 dark:border-gray-800 text-gray-400 hover:text-bcg-green hover:border-bcg-green items-center justify-center transition-all duration-500 hover:-translate-y-1 text-left text-left text-left text-left text-left"><i class="fas fa-arrow-up text-xs text-left text-left"></i></button>
+    </footer>
+
+    <script>
+        // === 狀態管理 ===
+        let currentLang = 'en';
+        let isDarkMode = true;
+        let isAudioPlaying = false;
+        let speechUtterance = null;
+        let activeSection = 'overview';
+        let hasShownSuccessModal = false;
+
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const themeToggle = document.getElementById('theme-toggle');
+        const langToggle = document.getElementById('lang-toggle');
+        const audioBtn = document.getElementById('audio-btn');
+        const audioStatus = document.getElementById('audio-status');
+        const checklistInputs = document.querySelectorAll('#checklist-container input[type="checkbox"]');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const successModal = document.getElementById('success-modal');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        function openMail(email) {
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+            window.open(gmailUrl, '_blank');
+        }
+
+        function closeModal() {
+            successModal.classList.add('hidden');
+            successModal.classList.remove('flex');
+            confettiContainer.innerHTML = '';
+        }
+
+        function triggerConfetti() {
+            const colors = ['#177a46', '#10b981', '#d4af37', '#ffffff', '#ffd700'];
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti-piece');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 8 + 5 + 'px';
+                confetti.style.height = Math.random() * 8 + 5 + 'px';
+                const fallDist = Math.random() * 100 + 100 + 'vh';
+                const horizontalDist = (Math.random() - 0.5) * 40 + 'vw';
+                confetti.animate([
+                    { transform: 'translateY(0) rotate(0)', opacity: 1 },
+                    { transform: `translateY(${fallDist}) translateX(${horizontalDist}) rotate(720deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    fill: 'forwards'
+                });
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        function showModal() {
+            if (!hasShownSuccessModal) {
+                successModal.classList.remove('hidden');
+                successModal.classList.add('flex');
+                triggerConfetti();
+                hasShownSuccessModal = true;
+            }
+        }
+
+        function init() {
+            if (localStorage.theme === 'light') {
+                isDarkMode = false;
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+            updateThemeIcon();
+            updateProgress();
+            
+            document.getElementById('menu-btn').addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+            themeToggle.addEventListener('click', toggleTheme);
+            langToggle.addEventListener('click', toggleLanguage);
+            audioBtn.addEventListener('click', toggleAudio);
+            
+            // 使用事件委託處理動態增減的 checkbox
+            document.getElementById('checklist-container').addEventListener('change', (e) => {
+                if(e.target.type === 'checkbox') updateProgress();
+            });
+        }
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            sidebar.classList.toggle('-translate-x-full', !isClosed);
+            overlay.classList.toggle('hidden', !isClosed);
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark', isDarkMode);
+            localStorage.theme = isDarkMode ? 'dark' : 'light';
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            themeToggle.innerHTML = isDarkMode 
+                ? '<i class="fas fa-sun text-lg"></i>' 
+                : '<i class="fas fa-moon text-lg"></i>';
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            document.querySelectorAll('.lang-en').forEach(el => el.classList.toggle('hidden', currentLang !== 'en'));
+            document.querySelectorAll('.lang-zh').forEach(el => el.classList.toggle('hidden', currentLang !== 'zh'));
+            langToggle.textContent = currentLang === 'en' ? 'EN / 繁' : '繁 / EN';
+            if(isAudioPlaying) stopAudio();
+            updateTitle();
+        }
+
+        function updateTitle() {
+            const titleSpan = document.getElementById('page-title');
+            const enText = activeSection === 'overview' ? 'Overview' : 'Orientation';
+            const zhText = activeSection === 'overview' ? '綜覽' : '課程定位';
+            titleSpan.querySelector('.lang-en').textContent = enText;
+            titleSpan.querySelector('.lang-zh').textContent = zhText;
+        }
+
+        function switchSection(sectionId) {
+            ['overview', 'w1w2'].forEach(id => {
+                document.getElementById('section-' + id).classList.add('hidden');
+                document.getElementById('nav-' + id).classList.remove('bg-bcg-green/10', 'text-bcg-green', 'font-bold');
+                document.getElementById('nav-' + id).classList.add('text-gray-500');
+            });
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+            document.getElementById('nav-' + sectionId).classList.add('bg-bcg-green/10', 'text-bcg-green', 'font-bold');
+            document.getElementById('nav-' + sectionId).classList.remove('text-gray-500');
+            activeSection = sectionId;
+            updateTitle();
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const percentage = total === 0 ? 0 : Math.round((checked / total) * 100);
+            
+            progressBar.style.width = percentage + '%';
+            progressPercent.textContent = percentage + '%';
+            if (percentage === 100) {
+                setTimeout(showModal, 700);
+            } else {
+                hasShownSuccessModal = false;
+            }
+        }
+
+        function toggleAudio() {
+            if (isAudioPlaying) stopAudio();
+            else playAudio();
+        }
+
+        function playAudio() {
+            if (!('speechSynthesis' in window)) return;
+            let text = "";
+            if (currentLang === 'en') {
+                text = `Strategic Management Hub Overview. Currently on ${activeSection}. Welcome to the Strategic Management of Multinational Corporations. The class meets every Monday from 14:30 to 17:30, led by Professor Shihmin Lo. Orientation phase. Please check your Progress Unlock Status.`;
+            } else {
+                text = `國際策略管理導覽中心。當前位置為 ${activeSection === 'overview' ? '綜覽' : '課程定位'}。歡迎來到國際策略管理課程。本課程於每週一 14:30 至 17:30 在管院 B15 教室上課，由駱世民教授授課。課程定位階段。請查看您的進度條解鎖狀態。`;
+            }
+            speechUtterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            if (currentLang === 'en') {
+                speechUtterance.voice = voices.find(v => v.lang.includes('en-GB')) || voices.find(v => v.lang.includes('en-US'));
+            } else {
+                speechUtterance.voice = voices.find(v => v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh-CN'));
+            }
+            speechUtterance.onstart = () => {
+                isAudioPlaying = true;
+                audioBtn.classList.add('text-bcg-green', 'bg-bcg-green/10');
+                audioStatus.classList.remove('hidden');
+                audioStatus.classList.add('flex');
+                document.getElementById('audio-text').textContent = currentLang === 'en' ? "Audio Guide Active" : "語音導覽中";
+            };
+            speechUtterance.onend = stopAudio;
+            window.speechSynthesis.speak(speechUtterance);
+        }
+
+        function stopAudio() {
+            window.speechSynthesis.cancel();
+            isAudioPlaying = false;
+            audioBtn.classList.remove('text-bcg-green', 'bg-bcg-green/10');
+            audioStatus.classList.add('hidden');
+            audioStatus.classList.remove('flex');
+        }
+
+        window.onload = init;
+        window.speechSynthesis.onvoiceschanged = () => {};
+    </script>
+</body>
+</html>
