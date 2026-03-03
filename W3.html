@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMMC Weekly Briefing | Executive Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bcg: {
+                            green: '#004526',
+                            light: '#F8F9FA',
+                            dark: '#121212',
+                            border: '#E5E7EB'
+                        }
+                    },
+                    fontSize: {
+                        'xxs': '0.65rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease;
+        }
+
+        /* 專業顧問風格卡片 */
+        .consultant-card {
+            @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all duration-300;
+        }
+        .consultant-card:hover {
+            @apply shadow-lg border-bcg-green/30 dark:border-white/20;
+        }
+
+        /* 標題裝飾線 */
+        .accent-line {
+            border-top: 3px solid #004526;
+        }
+        .dark .accent-line {
+            border-top: 3px solid #FFFFFF;
+        }
+
+        /* 重點文字強調 */
+        .text-highlight {
+            @apply font-semibold text-slate-900 dark:text-white border-b border-bcg-green/50;
+        }
+
+        /* 隱藏滾動條 */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* 懸停提示框動畫 */
+        .tooltip-content {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s ease-in-out;
+        }
+        .group:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-bcg-dark text-slate-700 dark:text-slate-300 min-h-screen">
+
+    <!-- 導覽列 RWD -->
+    <nav class="border-b bg-white dark:bg-slate-900 dark:border-slate-800 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <div class="w-1 bg-bcg-green h-4 md:h-5 dark:bg-white transition-colors"></div>
+            <span class="font-bold tracking-tighter text-sm md:text-base uppercase dark:text-white whitespace-nowrap">
+                SMMC <span id="nav-sub" class="hidden sm:inline font-normal text-slate-400 text-xs md:text-sm">| 執行簡報</span>
+            </span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleLanguage()" class="text-xxs font-bold px-2 md:px-3 py-1.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded transition uppercase tracking-widest flex items-center">
+                <i class="fas fa-language mr-1 md:mr-2"></i>
+                <span id="lang-btn-text">English</span>
+            </button>
+            <button onclick="toggleDarkMode()" class="text-xxs font-bold px-2 md:px-2 py-1.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded transition">
+                <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto py-6 md:py-10 px-4 md:px-10">
+        
+        <!-- Header RWD -->
+        <header class="mb-8 md:mb-10 text-left text-slate-900 dark:text-white">
+            <h1 id="main-title" class="text-2xl md:text-4xl font-light tracking-tight mb-2 leading-tight">課程每週更新報告</h1>
+            <div class="flex items-center text-slate-400 text-[10px] md:text-xxs uppercase tracking-[0.1em] md:tracking-[0.2em] font-bold">
+                <span id="sub-title">第三週 — 策略性提醒</span>
+                <span class="mx-2 md:mx-3 text-slate-300">|</span>
+                <span>March 2026</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+            
+            <!-- 主要內容區 -->
+            <div class="lg:col-span-8 space-y-6 md:space-y-8">
+                
+                <!-- Section 1: Recap -->
+                <section class="consultant-card accent-line p-6 md:p-8 shadow-sm">
+                    <h2 id="section-recap" class="text-xxs font-bold uppercase tracking-[0.2em] text-bcg-green dark:text-white mb-4 md:mb-6 text-left">Executive Summary</h2>
+                    <p id="recap-content" class="text-base md:text-xl leading-relaxed font-light italic text-slate-600 dark:text-slate-300 text-left">
+                        希望昨天的課程有助於各位更熟悉 <span class="text-highlight">AI 逐字稿工具</span> 與 <span class="text-highlight">教室設備</span>。未來的課程中我們也會不時用到 <span class="text-highlight">螢幕投影與錄製</span>，請別忘了如何使用！
+                    </p>
+                </section>
+
+                <!-- Section 2: Assignment -->
+                <section class="consultant-card p-0 overflow-hidden shadow-sm">
+                    <div class="bg-red-600 px-4 md:px-6 py-2 flex justify-between items-center">
+                        <span id="badge-priority" class="text-white text-[10px] md:text-xxs font-bold uppercase tracking-widest text-center">High Priority Action Item</span>
+                        <i class="fas fa-exclamation-circle text-white/50"></i>
+                    </div>
+                    <div class="p-6 md:p-8 text-left">
+                        <h3 id="assignment-title" class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-4">新的自我介紹影片 (with GenAI)</h3>
+                        <p id="assignment-desc" class="text-sm md:text-base text-slate-500 dark:text-slate-400 mb-6 md:mb-8 leading-relaxed">
+                            請錄製另一段自我介紹。與第一次作業不同的是，這次我們將利用 <span class="text-highlight">AI 來協助潤飾你的腳本</span>。
+                        </p>
+
+                        <!-- 政策與截止日期 Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8 border-y border-slate-100 dark:border-slate-700 py-6 md:py-8">
+                            <div class="space-y-2">
+                                <h4 id="policy-label" class="text-xxs font-bold uppercase text-red-600 mb-2 tracking-widest">Mandatory Policy</h4>
+                                <p id="voice-warning" class="font-bold text-slate-900 dark:text-white text-lg md:text-xl leading-tight">錄製仍須使用你本人的聲音！</p>
+                                <p id="voice-sub-warning" class="text-xs text-red-700 dark:text-red-400 font-semibold tracking-wide uppercase">YOU MUST USE YOUR OWN VOICE!</p>
+                            </div>
+                            <div class="sm:border-l sm:pl-8 border-slate-100 dark:border-slate-700 space-y-2">
+                                <h4 id="deadline-label" class="text-xxs font-bold uppercase text-slate-400 mb-2 tracking-widest">Submission Deadline</h4>
+                                <div id="date-deadline" class="text-lg md:text-xl font-bold text-bcg-green dark:text-white">3 月 7 日（週六）12:00 中午</div>
+                            </div>
+                        </div>
+
+                        <!-- 規範 Hover 效果 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-start gap-4 md:gap-10">
+                            <div class="flex flex-wrap gap-6 md:gap-10 text-xxs font-bold text-slate-500 uppercase tracking-widest">
+                                <!-- Rule 1: Hover Naming -->
+                                <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
+                                    <span id="rule1" class="flex items-center">
+                                        <i class="fas fa-info-circle text-bcg-green mr-2 text-xs md:text-sm"></i> 影片命名規範
+                                    </span>
+                                    <div id="rule1-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-normal max-w-[280px] sm:max-w-md z-10 dark:bg-white dark:text-bcg-green border border-white/20">
+                                        格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese mane_English Name
+                                    </div>
+                                </div>
+                                <!-- Rule 2: Hover Length -->
+                                <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
+                                    <span id="rule2" class="flex items-center">
+                                        <i class="fas fa-stopwatch text-bcg-green mr-2 text-xs md:text-sm"></i> 影片長度要求
+                                    </span>
+                                    <div id="rule2-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-nowrap z-10 dark:bg-white dark:text-bcg-green border border-white/20">
+                                        1分鐘+-5秒
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 側邊資訊區 -->
+            <div class="lg:col-span-4 space-y-6 text-left">
+                <section class="consultant-card p-6 shadow-sm text-slate-900 dark:text-white">
+                    <h3 id="section-participation" class="text-xxs font-bold uppercase tracking-[0.2em] mb-6 border-b border-slate-100 dark:border-slate-700 pb-3 text-slate-400">Participation Status</h3>
+                    <div class="space-y-6">
+                        <div class="group">
+                            <h4 id="card1Title" class="text-sm font-bold flex items-center mb-1">
+                                <span class="w-1.5 h-1.5 bg-bcg-green dark:bg-white rounded-full mr-2"></span>
+                                每週攜帶桌牌
+                            </h4>
+                            <p id="card1Desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">每週上課請務必攜帶桌牌以便識別。</p>
+                        </div>
+                        <div class="group">
+                            <h4 id="card2Title" class="text-sm font-bold flex items-center mb-1">
+                                <span class="w-1.5 h-1.5 bg-bcg-green dark:bg-white rounded-full mr-2"></span>
+                                瀏覽 Moodle
+                            </h4>
+                            <p id="card2Desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">每週瀏覽 Moodle 資訊以維持參與分數。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-bcg-green dark:bg-white p-6 shadow-lg rounded-sm text-white dark:text-bcg-green">
+                    <h3 id="absence-label" class="text-xxs font-bold uppercase tracking-[0.2em] mb-4 opacity-70">Policy: Absence</h3>
+                    <p id="absence-text" class="text-sm leading-relaxed font-medium">
+                        若無法出席課程，請至 Moodle 的 General 區域提交請假申請。
+                    </p>
+                    <div id="absence-footer" class="mt-6 text-[9px] uppercase font-black tracking-widest opacity-40 border-t border-white/10 dark:border-bcg-green/10 pt-4">
+                        General Section Required
+                    </div>
+                </section>
+
+                <div class="px-2 pb-6 lg:pb-0">
+                    <p id="footer-text" class="text-xxs font-bold text-slate-400 uppercase tracking-widest leading-loose">
+                        報告結束 — 課程內部機密 (Confidential)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentLang = 'zh';
+        const translations = {
+            zh: {
+                'lang-btn-text': 'English',
+                'nav-sub': '| 執行簡報',
+                'main-title': '課程每週更新報告',
+                'sub-title': '第三週 — 策略性提醒',
+                'section-recap': 'Executive Summary',
+                'recap-content': '希望昨天的課程有助於各位更熟悉 <span class="text-highlight">AI 逐字稿工具</span> 與 <span class="text-highlight">教室設備</span>。未來的課程中我們也會不時用到 <span class="text-highlight">螢幕投影與錄製</span>，請別忘了如何使用！',
+                'badge-priority': 'High Priority Action Item',
+                'assignment-title': '新的自我介紹影片 (with GenAI)',
+                'assignment-desc': '請錄製另一段自我介紹。與第一次作業不同的是，這次我們將利用 <span class="text-highlight">AI 來協助潤飾你的腳本</span>。',
+                'policy-label': 'Mandatory Policy',
+                'voice-warning': '錄製仍須使用你本人的聲音！',
+                'voice-sub-warning': 'YOU MUST USE YOUR OWN VOICE!',
+                'deadline-label': 'Submission Deadline',
+                'date-deadline': '3 月 7 日（週六）12:00 中午',
+                'rule1': '影片命名規範',
+                'rule1-tip': '格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese mane_English Name',
+                'rule2': '影片長度要求',
+                'rule2-tip': '1分鐘+-5秒',
+                'section-participation': 'Participation Status',
+                'card1Title': '每週攜帶桌牌',
+                'card1Desc': '每週上課請務必攜帶桌牌以便識別。',
+                'card2Title': '瀏覽 Moodle',
+                'card2Desc': '每週瀏覽 Moodle 資訊以維持參與分數。',
+                'absence-label': 'Policy: Absence',
+                'absence-text': '若無法出席課程，請至 Moodle 的 General 區域提交請假申請。',
+                'absence-footer': 'General Section Required',
+                'footer-text': '報告結束 — 課程內部機密 (Confidential)'
+            },
+            en: {
+                'lang-btn-text': '中文',
+                'nav-sub': '| Executive Briefing',
+                'main-title': 'Weekly Course Briefing',
+                'sub-title': 'Week 03 — Strategic Reminders',
+                'section-recap': 'Executive Summary',
+                'recap-content': 'Hope yesterday’s session helped you master <span class="text-highlight">AI transcription tools</span> and <span class="text-highlight">classroom hardware</span>. Screen projection and recording will be utilized frequently—stay prepared!',
+                'badge-priority': 'High Priority Action Item',
+                'assignment-title': 'New Self-Intro Video (with GenAI)',
+                'assignment-desc': 'Record another introduction. This time, leverage <span class="text-highlight">AI to refine your script</span> for a professional edge.',
+                'policy-label': 'Mandatory Policy',
+                'voice-warning': 'YOU MUST USE YOUR OWN VOICE!',
+                'voice-sub-warning': 'Voice cloning or AI voices are strictly prohibited.',
+                'deadline-label': 'Submission Deadline',
+                'date-deadline': 'Sat, March 7 @ 12:00 PM',
+                'rule1': 'Naming Rules',
+                'rule1-tip': 'Format: NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese name_English Name',
+                'rule2': 'Length Policy',
+                'rule2-tip': '1 min ± 5 sec',
+                'section-participation': 'Participation Status',
+                'card1Title': 'Bring Tablecard',
+                'card1Desc': 'Bring your tablecard to class every week for professional identification.',
+                'card2Title': 'Browse Moodle',
+                'card2Desc': 'Moodle activity is tracked weekly and affects your score.',
+                'absence-label': 'Policy: Absence',
+                'absence-text': 'Absences must be officially requested via the General Section on Moodle.',
+                'absence-footer': 'General Section Required',
+                'footer-text': 'End of Report — Internal Distribution (Confidential)'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            const t = translations[currentLang];
+            
+            // 更新 ID 與內容對應
+            const ids = [
+                'lang-btn-text', 'nav-sub', 'main-title', 'sub-title', 'section-recap', 'recap-content',
+                'badge-priority', 'assignment-title', 'assignment-desc', 'policy-label',
+                'voice-warning', 'voice-sub-warning', 'deadline-label', 'date-deadline',
+                'section-participation', 'card1Title', 'card1Desc',
+                'card2Title', 'card2Desc', 'absence-label', 'absence-text',
+                'absence-footer', 'footer-text'
+            ];
+
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (t[id]) {
+                        el.innerHTML = t[id];
+                    }
+                }
+            });
+
+            // 更新規則文字與提示
+            const r1 = document.getElementById('rule1');
+            if (r1 && t['rule1']) r1.innerHTML = `<i class="fas fa-info-circle text-bcg-green mr-2 text-xs md:text-sm"></i> ${t['rule1']}`;
+            const r1Tip = document.getElementById('rule1-tip');
+            if (r1Tip && t['rule1-tip']) r1Tip.innerText = t['rule1-tip'];
+
+            const r2 = document.getElementById('rule2');
+            if (r2 && t['rule2']) r2.innerHTML = `<i class="fas fa-stopwatch text-bcg-green mr-2 text-xs md:text-sm"></i> ${t['rule2']}`;
+            const r2Tip = document.getElementById('rule2-tip');
+            if (r2Tip && t['rule2-tip']) r2Tip.innerText = t['rule2-tip'];
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fas fa-moon';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fas fa-sun';
+            }
+        }
+    </script>
+</body>
+</html>
