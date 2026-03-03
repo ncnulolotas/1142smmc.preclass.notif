@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMMC Weekly Briefing | Executive Summary</title>
+    <title>SMMC Weekly Briefing | W3 Focus</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -32,9 +32,9 @@
         body { 
             font-family: 'Inter', sans-serif; 
             transition: background-color 0.3s ease;
+            scroll-behavior: smooth;
         }
 
-        /* 專業顧問風格卡片 */
         .consultant-card {
             @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all duration-300;
         }
@@ -42,7 +42,6 @@
             @apply shadow-lg border-bcg-green/30 dark:border-white/20;
         }
 
-        /* 標題裝飾線 */
         .accent-line {
             border-top: 3px solid #004526;
         }
@@ -50,18 +49,12 @@
             border-top: 3px solid #FFFFFF;
         }
 
-        /* 重點文字強調 */
         .text-highlight {
             @apply font-semibold text-slate-900 dark:text-white border-b border-bcg-green/50;
         }
 
-        /* 隱藏滾動條 */
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-        /* 懸停提示框動畫 */
         .tooltip-content {
             opacity: 0;
             visibility: hidden;
@@ -77,9 +70,10 @@
 </head>
 <body class="bg-slate-50 dark:bg-bcg-dark text-slate-700 dark:text-slate-300 min-h-screen">
 
-    <!-- 導覽列 RWD -->
+    <!-- 導覽列 -->
     <nav class="border-b bg-white dark:bg-slate-900 dark:border-slate-800 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <div class="flex items-center space-x-2 md:space-x-3">
+        <!-- 品牌標誌：加入點擊回頂端功能 -->
+        <div onclick="scrollToTop()" class="flex items-center space-x-2 md:space-x-3 cursor-pointer hover:opacity-80 transition-opacity active:scale-95 duration-200">
             <div class="w-1 bg-bcg-green h-4 md:h-5 dark:bg-white transition-colors"></div>
             <span class="font-bold tracking-tighter text-sm md:text-base uppercase dark:text-white whitespace-nowrap">
                 SMMC <span id="nav-sub" class="hidden sm:inline font-normal text-slate-400 text-xs md:text-sm">| 執行簡報</span>
@@ -98,11 +92,11 @@
 
     <main class="max-w-5xl mx-auto py-6 md:py-10 px-4 md:px-10">
         
-        <!-- Header RWD -->
+        <!-- Header -->
         <header class="mb-8 md:mb-10 text-left text-slate-900 dark:text-white">
-            <h1 id="main-title" class="text-2xl md:text-4xl font-light tracking-tight mb-2 leading-tight">課程每週更新報告</h1>
+            <h1 id="main-title" class="text-2xl md:text-4xl font-light tracking-tight mb-2 leading-tight">W3 課程大綱與行動指南</h1>
             <div class="flex items-center text-slate-400 text-[10px] md:text-xxs uppercase tracking-[0.1em] md:tracking-[0.2em] font-bold">
-                <span id="sub-title">第三週 — 策略性提醒</span>
+                <span id="sub-title">第三週 — PM、JD 與 終端專案</span>
                 <span class="mx-2 md:mx-3 text-slate-300">|</span>
                 <span>March 2026</span>
             </div>
@@ -113,96 +107,101 @@
             <!-- 主要內容區 -->
             <div class="lg:col-span-8 space-y-6 md:space-y-8">
                 
-                <!-- Section 1: Recap -->
+                <!-- Section 1: Core Agenda -->
                 <section class="consultant-card accent-line p-6 md:p-8 shadow-sm">
-                    <h2 id="section-recap" class="text-xxs font-bold uppercase tracking-[0.2em] text-bcg-green dark:text-white mb-4 md:mb-6 text-left">Executive Summary</h2>
+                    <h2 id="section-recap" class="text-xxs font-bold uppercase tracking-[0.2em] text-bcg-green dark:text-white mb-4 md:mb-6 text-left">W3 Core Agenda</h2>
                     <p id="recap-content" class="text-base md:text-xl leading-relaxed font-light italic text-slate-600 dark:text-slate-300 text-left">
-                        希望昨天的課程有助於各位更熟悉 <span class="text-highlight">AI 逐字稿工具</span> 與 <span class="text-highlight">教室設備</span>。未來的課程中我們也會不時用到 <span class="text-highlight">螢幕投影與錄製</span>，請別忘了如何使用！
+                        本週核心在於探索 <span class="text-highlight">產品經理 (PM)</span> 的職能特質、<span class="text-highlight">職務描述 (JD)</span> 的策略性分析，以及啟動本學期的 <span class="text-highlight">終端專案 (Term Project)</span> 設計。
                     </p>
                 </section>
 
                 <!-- Section 2: Assignment -->
-                <section class="consultant-card p-0 overflow-hidden shadow-sm">
-                    <div class="bg-red-600 px-4 md:px-6 py-2 flex justify-between items-center">
-                        <span id="badge-priority" class="text-white text-[10px] md:text-xxs font-bold uppercase tracking-widest text-center">High Priority Action Item</span>
-                        <i class="fas fa-exclamation-circle text-white/50"></i>
-                    </div>
-                    <div class="p-6 md:p-8 text-left">
-                        <h3 id="assignment-title" class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-4">新的自我介紹影片 (with GenAI)</h3>
-                        <p id="assignment-desc" class="text-sm md:text-base text-slate-500 dark:text-slate-400 mb-6 md:mb-8 leading-relaxed">
-                            請錄製另一段自我介紹。與第一次作業不同的是，這次我們將利用 <span class="text-highlight">AI 來協助潤飾你的腳本</span>。
-                        </p>
-
-                        <!-- 政策與截止日期 Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8 border-y border-slate-100 dark:border-slate-700 py-6 md:py-8">
-                            <div class="space-y-2">
-                                <h4 id="policy-label" class="text-xxs font-bold uppercase text-red-600 mb-2 tracking-widest">Mandatory Policy</h4>
-                                <p id="voice-warning" class="font-bold text-slate-900 dark:text-white text-lg md:text-xl leading-tight">錄製仍須使用你本人的聲音！</p>
-                                <p id="voice-sub-warning" class="text-xs text-red-700 dark:text-red-400 font-semibold tracking-wide uppercase">YOU MUST USE YOUR OWN VOICE!</p>
-                            </div>
-                            <div class="sm:border-l sm:pl-8 border-slate-100 dark:border-slate-700 space-y-2">
-                                <h4 id="deadline-label" class="text-xxs font-bold uppercase text-slate-400 mb-2 tracking-widest">Submission Deadline</h4>
-                                <div id="date-deadline" class="text-lg md:text-xl font-bold text-bcg-green dark:text-white">3 月 7 日（週六）12:00 中午</div>
-                            </div>
+                <section class="consultant-card p-0 overflow-hidden shadow-sm border-l-4 border-l-red-600">
+                    <div class="bg-red-600/5 px-6 py-4">
+                        <h3 id="assignment-title" class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">自我介紹影片 (with GenAI)</h3>
+                        <div id="assignment-deadline-text" class="flex items-center text-red-600 text-xxs font-black uppercase tracking-widest mb-4">
+                            <i class="fas fa-clock mr-2"></i> 截止日期：3 月 7 日 12:00 中午
                         </div>
-
-                        <!-- 規範 Hover 效果 -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-start gap-4 md:gap-10">
-                            <div class="flex flex-wrap gap-6 md:gap-10 text-xxs font-bold text-slate-500 uppercase tracking-widest">
-                                <!-- Rule 1: Hover Naming -->
-                                <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
-                                    <span id="rule1" class="flex items-center">
-                                        <i class="fas fa-info-circle text-bcg-green mr-2 text-xs md:text-sm"></i> 影片命名規範
-                                    </span>
-                                    <div id="rule1-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-normal max-w-[280px] sm:max-w-md z-10 dark:bg-white dark:text-bcg-green border border-white/20">
-                                        格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese mane_English Name
-                                    </div>
+                        
+                        <div class="flex flex-wrap gap-4 md:gap-10 text-xxs font-bold text-slate-500 uppercase tracking-widest">
+                            <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
+                                <span id="rule1" class="flex items-center"><i class="fas fa-info-circle text-bcg-green mr-2"></i> 影片命名規範</span>
+                                <div id="rule1-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-normal max-w-[280px] z-10 dark:bg-white dark:text-bcg-green border border-white/20">
+                                    格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese name_English Name
                                 </div>
-                                <!-- Rule 2: Hover Length -->
-                                <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
-                                    <span id="rule2" class="flex items-center">
-                                        <i class="fas fa-stopwatch text-bcg-green mr-2 text-xs md:text-sm"></i> 影片長度要求
-                                    </span>
-                                    <div id="rule2-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-nowrap z-10 dark:bg-white dark:text-bcg-green border border-white/20">
-                                        1分鐘+-5秒
-                                    </div>
+                            </div>
+                            <div class="relative group cursor-help border-b border-transparent hover:border-bcg-green transition-all pb-1">
+                                <span id="rule2" class="flex items-center"><i class="fas fa-stopwatch text-bcg-green mr-2"></i> 影片長度要求</span>
+                                <div id="rule2-tip" class="tooltip-content absolute bottom-full mb-2 left-0 bg-bcg-green text-white text-[10px] p-3 rounded shadow-xl whitespace-nowrap z-10 dark:bg-white dark:text-bcg-green border border-white/20">
+                                    1分鐘+-5秒
                                 </div>
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <!-- Section 3: Action Items -->
+                <section class="consultant-card p-6 md:p-8 shadow-sm">
+                    <h2 id="todo-label" class="text-xxs font-bold uppercase tracking-[0.2em] text-bcg-green dark:text-white mb-6 text-left">同學需先做的行動清單</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center mr-4 mt-1 flex-shrink-0 text-slate-900 dark:text-white">
+                                <span class="text-xs font-bold">1</span>
+                            </div>
+                            <div>
+                                <p id="todo1-title" class="font-bold text-slate-900 dark:text-white text-left">平台註冊</p>
+                                <p id="todo1-desc" class="text-sm text-slate-500 text-left">強烈建議完成 104 人力銀行與 LinkedIn 的帳號註冊，以便進行職能對標分析。</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center mr-4 mt-1 flex-shrink-0 text-slate-900 dark:text-white">
+                                <span class="text-xs font-bold">2</span>
+                            </div>
+                            <div>
+                                <p id="todo2-title" class="font-bold text-slate-900 dark:text-white text-left">證券開戶準備</p>
+                                <p id="todo2-desc" class="text-sm text-slate-500 text-left">準備證券開戶手續，並熟悉後續交易 APP 的基本操作介面。</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center mr-4 mt-1 flex-shrink-0 text-slate-900 dark:text-white">
+                                <span class="text-xs font-bold">3</span>
+                            </div>
+                            <div>
+                                <p id="todo3-title" class="font-bold text-slate-900 dark:text-white text-left">TP 專案預習</p>
+                                <p id="todo3-desc" class="text-sm text-slate-500 text-left">先行點擊 Moodle 或大綱中的教學影片，觀看 1141 SPA 範例（BNA & CDPS）。</p>
+                            </div>
+                        </li>
+                    </ul>
                 </section>
             </div>
 
-            <!-- 側邊資訊區 -->
+            <!-- 右側輔助資訊 -->
             <div class="lg:col-span-4 space-y-6 text-left">
-                <section class="consultant-card p-6 shadow-sm text-slate-900 dark:text-white">
-                    <h3 id="section-participation" class="text-xxs font-bold uppercase tracking-[0.2em] mb-6 border-b border-slate-100 dark:border-slate-700 pb-3 text-slate-400">Participation Status</h3>
-                    <div class="space-y-6">
-                        <div class="group">
-                            <h4 id="card1Title" class="text-sm font-bold flex items-center mb-1">
-                                <span class="w-1.5 h-1.5 bg-bcg-green dark:bg-white rounded-full mr-2"></span>
-                                每週攜帶桌牌
-                            </h4>
-                            <p id="card1Desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">每週上課請務必攜帶桌牌以便識別。</p>
-                        </div>
-                        <div class="group">
-                            <h4 id="card2Title" class="text-sm font-bold flex items-center mb-1">
-                                <span class="w-1.5 h-1.5 bg-bcg-green dark:bg-white rounded-full mr-2"></span>
-                                瀏覽 Moodle
-                            </h4>
-                            <p id="card2Desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">每週瀏覽 Moodle 資訊以維持參與分數。</p>
-                        </div>
+                <!-- Reference Links -->
+                <section class="consultant-card p-6 shadow-sm">
+                    <h3 id="section-participation" class="text-xxs font-bold uppercase tracking-[0.2em] mb-6 border-b border-slate-100 dark:border-slate-700 pb-3 text-slate-400">大綱重要連結</h3>
+                    <div class="space-y-4">
+                        <a href="https://ic.tpex.org.tw/" target="_blank" class="block group">
+                            <p id="link-industry" class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-bcg-green transition-colors">產業價值鏈資訊平台</p>
+                            <p id="link-industry-sub" class="text-[10px] text-slate-400 uppercase italic">Industry Analysis</p>
+                        </a>
+                        <a href="https://mops.twse.com.tw/mops/web/index" target="_blank" class="block group">
+                            <p id="link-mops" class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-bcg-green transition-colors">公開資訊觀測站 (MOPS)</p>
+                            <p id="link-mops-sub" class="text-[10px] text-slate-400 uppercase italic">Public Database</p>
+                        </a>
+                        <a href="https://youtu.be/dfygD7fQZP4" target="_blank" class="block group text-red-600">
+                            <p id="link-tp" class="text-xs font-bold group-hover:underline transition-all">TP 專案教學影片</p>
+                            <p id="link-tp-sub" class="text-[10px] opacity-70 italic">請優先觀看</p>
+                        </a>
                     </div>
                 </section>
 
+                <!-- Policy Card -->
                 <section class="bg-bcg-green dark:bg-white p-6 shadow-lg rounded-sm text-white dark:text-bcg-green">
-                    <h3 id="absence-label" class="text-xxs font-bold uppercase tracking-[0.2em] mb-4 opacity-70">Policy: Absence</h3>
+                    <h3 id="absence-label" class="text-xxs font-bold uppercase tracking-[0.2em] mb-4 opacity-70">Policy: Attendance</h3>
                     <p id="absence-text" class="text-sm leading-relaxed font-medium">
-                        若無法出席課程，請至 Moodle 的 General 區域提交請假申請。
+                        若因故無法出席 W3 實體課程，請務必至 Moodle General 區域請假。
                     </p>
-                    <div id="absence-footer" class="mt-6 text-[9px] uppercase font-black tracking-widest opacity-40 border-t border-white/10 dark:border-bcg-green/10 pt-4">
-                        General Section Required
-                    </div>
                 </section>
 
                 <div class="px-2 pb-6 lg:pb-0">
@@ -220,96 +219,103 @@
             zh: {
                 'lang-btn-text': 'English',
                 'nav-sub': '| 執行簡報',
-                'main-title': '課程每週更新報告',
-                'sub-title': '第三週 — 策略性提醒',
-                'section-recap': 'Executive Summary',
-                'recap-content': '希望昨天的課程有助於各位更熟悉 <span class="text-highlight">AI 逐字稿工具</span> 與 <span class="text-highlight">教室設備</span>。未來的課程中我們也會不時用到 <span class="text-highlight">螢幕投影與錄製</span>，請別忘了如何使用！',
-                'badge-priority': 'High Priority Action Item',
-                'assignment-title': '新的自我介紹影片 (with GenAI)',
-                'assignment-desc': '請錄製另一段自我介紹。與第一次作業不同的是，這次我們將利用 <span class="text-highlight">AI 來協助潤飾你的腳本</span>。',
-                'policy-label': 'Mandatory Policy',
-                'voice-warning': '錄製仍須使用你本人的聲音！',
-                'voice-sub-warning': 'YOU MUST USE YOUR OWN VOICE!',
-                'deadline-label': 'Submission Deadline',
-                'date-deadline': '3 月 7 日（週六）12:00 中午',
+                'main-title': 'W3 課程大綱與行動指南',
+                'sub-title': '第三週 — PM、JD 與 終端專案',
+                'section-recap': 'W3 Core Agenda',
+                'recap-content': '本週核心在於探索 <span class="text-highlight">產品經理 (PM)</span> 的職能特質、<span class="text-highlight">職務描述 (JD)</span> 的策略性分析，以及啟動本學期的 <span class="text-highlight">終端專案 (Term Project)</span> 設計。',
+                'assignment-title': '自我介紹影片 (with GenAI)',
+                'assignment-deadline-text': '<i class="fas fa-clock mr-2"></i> 截止日期：3 月 7 日 12:00 中午',
                 'rule1': '影片命名規範',
-                'rule1-tip': '格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese mane_English Name',
+                'rule1-tip': '格式:NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese name_English Name',
                 'rule2': '影片長度要求',
                 'rule2-tip': '1分鐘+-5秒',
-                'section-participation': 'Participation Status',
-                'card1Title': '每週攜帶桌牌',
-                'card1Desc': '每週上課請務必攜帶桌牌以便識別。',
-                'card2Title': '瀏覽 Moodle',
-                'card2Desc': '每週瀏覽 Moodle 資訊以維持參與分數。',
-                'absence-label': 'Policy: Absence',
-                'absence-text': '若無法出席課程，請至 Moodle 的 General 區域提交請假申請。',
-                'absence-footer': 'General Section Required',
+                'todo-label': '同學需先做的行動清單',
+                'todo1-title': '平台註冊',
+                'todo1-desc': '強烈建議完成 104 人力銀行與 LinkedIn 的帳號註冊，以便進行職能對標分析。',
+                'todo2-title': '證券開戶準備',
+                'todo2-desc': '準備證券開戶手續，並熟悉後續交易 APP 的基本操作介面。',
+                'todo3-title': 'TP 專案預習',
+                'todo3-desc': '先行點擊 Moodle 或大綱中的教學影片，觀看 1141 SPA 範例（BNA & CDPS）。',
+                'section-participation': '大綱重要連結',
+                'link-industry': '產業價值鏈資訊平台',
+                'link-industry-sub': 'Industry Analysis',
+                'link-mops': '公開資訊觀測站 (MOPS)',
+                'link-mops-sub': 'Public Database',
+                'link-tp': 'TP 專案教學影片',
+                'link-tp-sub': '請優先觀看',
+                'absence-label': 'Policy: Attendance',
+                'absence-text': '若因故無法出席 W3 實體課程，請務必至 Moodle General 區域請假。',
                 'footer-text': '報告結束 — 課程內部機密 (Confidential)'
             },
             en: {
                 'lang-btn-text': '中文',
                 'nav-sub': '| Executive Briefing',
-                'main-title': 'Weekly Course Briefing',
-                'sub-title': 'Week 03 — Strategic Reminders',
-                'section-recap': 'Executive Summary',
-                'recap-content': 'Hope yesterday’s session helped you master <span class="text-highlight">AI transcription tools</span> and <span class="text-highlight">classroom hardware</span>. Screen projection and recording will be utilized frequently—stay prepared!',
-                'badge-priority': 'High Priority Action Item',
-                'assignment-title': 'New Self-Intro Video (with GenAI)',
-                'assignment-desc': 'Record another introduction. This time, leverage <span class="text-highlight">AI to refine your script</span> for a professional edge.',
-                'policy-label': 'Mandatory Policy',
-                'voice-warning': 'YOU MUST USE YOUR OWN VOICE!',
-                'voice-sub-warning': 'Voice cloning or AI voices are strictly prohibited.',
-                'deadline-label': 'Submission Deadline',
-                'date-deadline': 'Sat, March 7 @ 12:00 PM',
+                'main-title': 'W3 Syllabus & Action Guide',
+                'sub-title': 'Week 03 — PM, JD, and Term Project',
+                'section-recap': 'W3 Core Agenda',
+                'recap-content': 'This week focuses on <span class="text-highlight">Product Manager (PM)</span> competencies, <span class="text-highlight">Job Description (JD)</span> analysis, and the launch of the <span class="text-highlight">Term Project (TP)</span>.',
+                'assignment-title': 'Self-Intro Video (with GenAI)',
+                'assignment-deadline-text': '<i class="fas fa-clock mr-2"></i> Due: March 7 @ 12:00 Noon',
                 'rule1': 'Naming Rules',
                 'rule1-tip': 'Format: NCNU_1142 Strategic Management of Multinational Corporations_Department(grade)_Chinese name_English Name',
                 'rule2': 'Length Policy',
                 'rule2-tip': '1 min ± 5 sec',
-                'section-participation': 'Participation Status',
-                'card1Title': 'Bring Tablecard',
-                'card1Desc': 'Bring your tablecard to class every week for professional identification.',
-                'card2Title': 'Browse Moodle',
-                'card2Desc': 'Moodle activity is tracked weekly and affects your score.',
-                'absence-label': 'Policy: Absence',
-                'absence-text': 'Absences must be officially requested via the General Section on Moodle.',
-                'absence-footer': 'General Section Required',
+                'todo-label': 'Action Items for Students',
+                'todo1-title': 'Platform Enrollment',
+                'todo1-desc': 'Strongly suggested: Sign up for 104 Job Bank and LinkedIn for competency benchmarking.',
+                'todo2-title': 'Securities Account',
+                'todo2-desc': 'Prepare for Securities Account opening and familiarize yourself with Transaction APPs.',
+                'todo3-title': 'Term Project Briefing',
+                'todo3-desc': 'Watch TP tutorials and explore 1141 SPA examples (BNA & CDPS) on Moodle.',
+                'section-participation': 'External Resources',
+                'link-industry': 'Industry Value Chain Platform',
+                'link-industry-sub': 'Industry Analysis',
+                'link-mops': 'MOPS Public Database',
+                'link-mops-sub': 'Financial Disclosures',
+                'link-tp': 'TP Video Tutorial',
+                'link-tp-sub': 'Watch First',
+                'absence-label': 'Policy: Attendance',
+                'absence-text': 'Please submit an absence request on Moodle if you cannot attend the W3 session.',
                 'footer-text': 'End of Report — Internal Distribution (Confidential)'
             }
         };
+
+        // 回到最頂端功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             const t = translations[currentLang];
             
-            // 更新 ID 與內容對應
             const ids = [
                 'lang-btn-text', 'nav-sub', 'main-title', 'sub-title', 'section-recap', 'recap-content',
-                'badge-priority', 'assignment-title', 'assignment-desc', 'policy-label',
-                'voice-warning', 'voice-sub-warning', 'deadline-label', 'date-deadline',
-                'section-participation', 'card1Title', 'card1Desc',
-                'card2Title', 'card2Desc', 'absence-label', 'absence-text',
-                'absence-footer', 'footer-text'
+                'assignment-title', 'assignment-deadline-text', 'todo-label', 'todo1-title', 'todo1-desc', 
+                'todo2-title', 'todo2-desc', 'todo3-title', 'todo3-desc',
+                'section-participation', 'link-industry', 'link-industry-sub', 'link-mops', 
+                'link-mops-sub', 'link-tp', 'link-tp-sub', 'absence-label', 'absence-text', 'footer-text'
             ];
 
             ids.forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    if (t[id]) {
-                        el.innerHTML = t[id];
-                    }
+                if (el && t[id]) {
+                    el.innerHTML = t[id];
                 }
             });
 
-            // 更新規則文字與提示
             const r1 = document.getElementById('rule1');
-            if (r1 && t['rule1']) r1.innerHTML = `<i class="fas fa-info-circle text-bcg-green mr-2 text-xs md:text-sm"></i> ${t['rule1']}`;
+            if (r1) r1.innerHTML = `<i class="fas fa-info-circle text-bcg-green mr-2"></i> ${t['rule1']}`;
             const r1Tip = document.getElementById('rule1-tip');
-            if (r1Tip && t['rule1-tip']) r1Tip.innerText = t['rule1-tip'];
+            if (r1Tip) r1Tip.innerText = t['rule1-tip'];
 
             const r2 = document.getElementById('rule2');
-            if (r2 && t['rule2']) r2.innerHTML = `<i class="fas fa-stopwatch text-bcg-green mr-2 text-xs md:text-sm"></i> ${t['rule2']}`;
+            if (r2) r2.innerHTML = `<i class="fas fa-stopwatch text-bcg-green mr-2"></i> ${t['rule2']}`;
             const r2Tip = document.getElementById('rule2-tip');
-            if (r2Tip && t['rule2-tip']) r2Tip.innerText = t['rule2-tip'];
+            if (r2Tip) r2Tip.innerText = t['rule2-tip'];
         }
 
         function toggleDarkMode() {
