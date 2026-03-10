@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMMC 1142 — Course Schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg: #0C0F0A;
+  --surface: #141810;
+  --surface2: #1C221A;
+  --border: #252E23;
+  --green: #4ADE80;
+  --green-dim: #2D6B45;
+  --gold: #F0C040;
+  --red: #F87171;
+  --blue: #60A5FA;
+  --text: #E8EDE6;
+  --muted: #6B7A68;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --body: 'Epilogue', sans-serif;
+}
+.light {
+  --bg: #F5F3EE;
+  --surface: #FFFFFF;
+  --surface2: #EEF0EA;
+  --border: #DDE0D8;
+  --green: #1A6B3C;
+  --green-dim: #C6E6D4;
+  --gold: #8B6914;
+  --red: #C0392B;
+  --blue: #1D5FA8;
+  --text: #1A1F18;
+  --muted: #7A8575;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.3s;
+  gap: 8px;
+}
+.nav-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nav-logo {
+  font-family: var(--display);
+  font-size: 0.95rem; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-logo:hover { opacity: 0.75; }
+.nav-logo:active { opacity: 0.5; }
+.nav-logo span { color: var(--green); }
+.nav-tag {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  border: 1px solid var(--green-dim);
+  color: var(--green);
+  border-radius: 2px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+@media (max-width: 380px) { .nav-tag { display: none; } }
+.light .nav-tag { border-color: var(--green-dim); }
+.nav-right { display: flex; gap: 5px; flex-shrink: 0; }
+.btn-icon {
+  font-family: var(--mono);
+  font-size: 0.62rem; letter-spacing: 0.08em;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; border-radius: 2px;
+  transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+}
+.btn-icon:hover { border-color: var(--green); color: var(--green); }
+
+.hero {
+  max-width: 1100px; margin: 0 auto;
+  padding: 2rem 1rem 1.5rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+}
+@media (min-width: 700px) {
+  .hero {
+    padding: 3rem 1.5rem 2rem;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 2rem; align-items: end;
+  }
+}
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 20px; height: 1px; background: var(--green);
+}
+h1 {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 7vw, 3.5rem);
+  font-weight: 800; line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+h1 .accent { color: var(--green); }
+.hero-sub {
+  margin-top: 0.75rem;
+  font-size: 0.8rem; color: var(--muted); font-style: italic;
+  line-height: 1.6;
+}
+
+.grade-strip {
+  display: flex; gap: 4px; flex-wrap: nowrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px; padding: 0.875rem 1rem;
+  align-self: start;
+  width: 100%;
+}
+@media (min-width: 700px) {
+  .grade-strip { width: auto; min-width: 240px; }
+}
+.grade-item {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  flex: 1;
+}
+.grade-pct {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 4vw, 1.4rem); font-weight: 800;
+  color: var(--green); line-height: 1;
+}
+.grade-label {
+  font-family: var(--mono);
+  font-size: 0.5rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-top: 3px; text-align: center;
+}
+.grade-divider {
+  width: 1px; background: var(--border);
+  align-self: stretch; margin: 0 2px;
+}
+.grade-header {
+  font-family: var(--mono);
+  font-size: 0.55rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  width: 100%; margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+}
+
+.semester-bar {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1rem 1.5rem;
+}
+@media (min-width: 700px) { .semester-bar { padding: 0 1.5rem 2rem; } }
+.bar-label {
+  font-family: var(--mono);
+  font-size: 0.58rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+  display: flex; justify-content: space-between;
+}
+.bar-track {
+  display: flex; gap: 3px; height: 6px;
+}
+.bar-seg {
+  flex: 1; background: var(--border); border-radius: 1px;
+  transition: background 0.3s;
+  cursor: pointer; position: relative;
+}
+.bar-seg:hover { background: var(--green-dim); }
+.bar-seg.past { background: var(--green-dim); }
+.bar-seg.current {
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(74,222,128,0.4);
+}
+.light .bar-seg.current { box-shadow: none; }
+
+/* ── NOTICE BANNER ── */
+.notice-banner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1rem 1.25rem;
+}
+@media (min-width: 700px) { .notice-banner { padding: 0 1.5rem 1.5rem; } }
+.notice-inner {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(240,192,64,0.08);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+}
+.notice-icon {
+  font-size: 0.85rem; color: var(--gold); flex-shrink: 0;
+}
+.notice-text {
+  font-family: var(--mono);
+  font-size: 0.62rem; color: var(--gold);
+  letter-spacing: 0.06em; line-height: 1.5;
+}
+.light .notice-inner {
+  background: rgba(139,105,20,0.07);
+  border-color: rgba(139,105,20,0.25);
+}
+
+.filter-tabs {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1rem 1.25rem;
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+@media (min-width: 700px) { .filter-tabs { padding: 0 1.5rem 1.5rem; } }
+.tab {
+  font-family: var(--mono);
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; border-radius: 2px;
+  transition: all 0.15s;
+}
+.tab:hover { border-color: var(--green); color: var(--green); }
+.tab.active { background: var(--green); border-color: var(--green); color: var(--bg); }
+
+.schedule {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1rem 4rem;
+  display: flex; flex-direction: column; gap: 3px;
+}
+@media (min-width: 700px) { .schedule { padding: 0 1.5rem 4rem; } }
+
+/* ── LOCKED WEEKS SECTION ── */
+.locked-section {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1rem 4rem;
+}
+@media (min-width: 700px) { .locked-section { padding: 0 1.5rem 4rem; } }
+.locked-block {
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  padding: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 0.5rem;
+  opacity: 0.45;
+  margin-top: 3px;
+}
+.locked-label {
+  font-family: var(--mono);
+  font-size: 0.6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.15em;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.week-row {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.3s;
+  animation: fadeIn 0.3s ease both;
+}
+.week-row:hover { border-color: var(--green-dim); }
+.week-row.current-week { border-color: var(--green) !important; }
+.week-row.next-week { border-color: var(--gold) !important; }
+.week-row.hidden { display: none; }
+
+/* ── PREVIEW (W4) highlight ── */
+.week-row.preview-week {
+  border-color: rgba(240,192,64,0.5) !important;
+}
+.week-row.preview-week .week-num { color: var(--gold) !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 20px;
+  align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+@media (min-width: 700px) {
+  .week-header {
+    grid-template-columns: 56px 1fr auto;
+    padding: 0.875rem 1.25rem;
+    gap: 1rem;
+  }
+}
+.week-header:hover { background: var(--surface2); }
+.week-num {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 4vw, 1.4rem); font-weight: 800;
+  line-height: 1;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.week-row.current-week .week-num { color: var(--green); }
+.week-meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.week-title {
+  font-family: var(--display);
+  font-size: clamp(0.8rem, 3vw, 0.9rem); font-weight: 600;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.week-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.wtag {
+  font-family: var(--mono);
+  font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.wtag.tp    { background: rgba(240,192,64,0.12); color: var(--gold); border: 1px solid rgba(240,192,64,0.25); }
+.wtag.ent   { background: rgba(96,165,250,0.1);  color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+.wtag.cs    { background: rgba(74,222,128,0.1);  color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+.wtag.peer  { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+.wtag.sdl   { background: rgba(180,130,255,0.1); color: #C084FC; border: 1px solid rgba(180,130,255,0.2); }
+.wtag.now   { background: var(--green); color: var(--bg); border: none; }
+.wtag.preview { background: rgba(240,192,64,0.2); color: var(--gold); border: 1px solid rgba(240,192,64,0.4); }
+.light .wtag.now { color: #fff; }
+.week-chevron {
+  font-size: 0.65rem; color: var(--muted);
+  transition: transform 0.2s;
+}
+.week-row.open .week-chevron { transform: rotate(180deg); }
+
+.week-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 1rem 1rem 1rem 1rem;
+}
+@media (min-width: 600px) {
+  .week-body { padding: 1.25rem 1.25rem 1.25rem 4.75rem; }
+}
+.week-row.open .week-body { display: block; }
+
+.topic-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+.topic-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 0.82rem; line-height: 1.6;
+  word-break: break-word;
+}
+.topic-bullet {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green-dim); flex-shrink: 0;
+  margin-top: 8px;
+}
+.light .topic-bullet { background: var(--green); }
+.week-row.current-week .topic-bullet { background: var(--green); }
+.week-row.preview-week .topic-bullet { background: var(--gold); }
+.topic-item a {
+  color: var(--green); font-family: var(--mono); font-size: 0.68rem;
+  text-decoration: none; border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+  display: inline-block; padding: 1px 0;
+}
+.topic-item a:hover { border-color: var(--green); }
+.light .topic-item a { color: var(--blue); }
+.topic-note {
+  font-family: var(--mono);
+  font-size: 0.62rem; color: var(--muted);
+  background: var(--surface2);
+  padding: 2px 7px; border-radius: 2px; margin-left: 4px;
+  white-space: nowrap;
+}
+.subtopic-list { list-style: none; margin-top: 0.4rem; padding-left: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.subtopic-list li {
+  font-size: 0.78rem; color: var(--muted); line-height: 1.4;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.subtopic-list li::before {
+  content: '—'; color: var(--border); flex-shrink: 0; font-size: 0.7rem; margin-top: 2px;
+}
+
+.week-row.holiday .week-num { color: var(--red); }
+.week-row.holiday { opacity: 0.7; }
+
+footer {
+  border-top: 1px solid var(--border);
+  max-width: 1100px; margin: 0 auto;
+  padding: 1.25rem 1rem;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+}
+@media (min-width: 700px) { footer { padding: 1.5rem; } }
+.footer-txt {
+  font-family: var(--mono);
+  font-size: 0.58rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+</style>
+</head>
+<body id="top">
+
+<nav>
+  <div class="nav-left">
+    <a class="nav-logo" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="Back to top" aria-label="Back to top"><span>SMMC</span>-EMI</a>
+    <span class="nav-tag">1142 · Spring 2026</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn-icon" onclick="toggleLang()">
+      <i class="fas fa-language"></i> <span id="langBtn">EN</span>
+    </button>
+    <button class="btn-icon" onclick="toggleTheme()" id="themeBtn">
+      <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow" id="heroEyebrow">課程時程 · 18 週</div>
+    <h1>1142 <span class="accent">SMMC</span><br><span id="heroTitle">課程藍圖</span></h1>
+    <p class="hero-sub" id="heroSub">跨國企業策略管理<br>授課教師：羅時敏 教授 &nbsp;·&nbsp; MGMT B15 &nbsp;·&nbsp; 1fgh &nbsp;(14:30–17:20)</p>
+  </div>
+  <div class="grade-strip">
+    <div class="grade-header" style="width:100%" id="gradeHeader">成績配分</div>
+    <div class="grade-item">
+      <div class="grade-pct">40%</div>
+      <div class="grade-label" id="gl1">終端<br>專案</div>
+    </div>
+    <div class="grade-divider"></div>
+    <div class="grade-item">
+      <div class="grade-pct">30%</div>
+      <div class="grade-label" id="gl2">同儕<br>評鑑</div>
+    </div>
+    <div class="grade-divider"></div>
+    <div class="grade-item">
+      <div class="grade-pct">15%</div>
+      <div class="grade-label" id="gl3">小組<br>簡報</div>
+    </div>
+    <div class="grade-divider"></div>
+    <div class="grade-item">
+      <div class="grade-pct">15%</div>
+      <div class="grade-label" id="gl4">課堂<br>參與</div>
+    </div>
+  </div>
+</div>
+
+<div class="semester-bar">
+  <div class="bar-label">
+    <span id="barLabel">學期進度</span>
+    <span id="barProgress">第 3 週 / 共 18 週</span>
+  </div>
+  <div class="bar-track" id="barTrack"></div>
+</div>
+
+<!-- Notice Banner -->
+<div class="notice-banner">
+  <div class="notice-inner">
+    <i class="fas fa-bell notice-icon"></i>
+    <div class="notice-text" id="noticeTxt">
+      請同學預習 W4 — 創業與策略 課程內容，下週課堂使用。
+    </div>
+  </div>
+</div>
+
+<div class="filter-tabs">
+  <button class="tab active" onclick="filterWeeks('all', this)" id="tab-all">全部週次</button>
+  <button class="tab" onclick="filterWeeks('tp', this)" id="tab-tp">終端專案</button>
+  <button class="tab" onclick="filterWeeks('ent', this)" id="tab-ent">ENT</button>
+  <button class="tab" onclick="filterWeeks('cs', this)" id="tab-cs">企業策略</button>
+  <button class="tab" onclick="filterWeeks('peer', this)" id="tab-peer">同儕評鑑</button>
+</div>
+
+<div class="schedule" id="schedule"></div>
+
+<!-- Locked weeks placeholder -->
+<div class="locked-section" id="lockedSection">
+  <div class="locked-block">
+    <i class="fas fa-lock" style="color:var(--muted);font-size:1rem;"></i>
+    <div class="locked-label"><span id="lockedLabel">W5 – W18 &nbsp;·&nbsp; 內容將逐步開放</span></div>
+    <div style="font-family:var(--mono);font-size:0.55rem;color:var(--muted);letter-spacing:0.08em;margin-top:2px;" id="lockedSub">尚未開放 · Stay tuned</div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-txt">SMMC-EMI · 1142 · Spring 2026 · Prof. Shihmin Lo</span>
+  <span class="footer-txt" id="footerRight">機密文件 — 僅供內部使用</span>
+</footer>
+
+<script>
+const CURRENT_WEEK = 3;
+const VISIBLE_WEEKS = 4; // W1 through W4 are shown
+
+const weeks = [
+  {
+    w: 1,
+    title: { zh: '課程導覽', en: 'Course Orientation' },
+    tags: [],
+    topics: [
+      { zh: '教授個人介紹 & Short Bio', en: "Prof. Lo's Introduction & Short Bio",
+        links: [{ label: 'Short Bio', url: 'https://drive.google.com/file/d/10UeqOG2sax8frL12roTeDqqh2a6x1/view?usp=drive_link' },
+                { label: 'YouTube Channel', url: 'https://youtube.com/@shihminlo6097' }] },
+      { zh: '1142 SMMC-EMI 大綱概覽', en: 'Syllabus Overview of 1142 SMMC-EMI' },
+      { zh: 'Google 雲端硬碟 & Moodle / BBB 介紹', en: 'Google Shared Drives & Moodle/BBB Introduction' },
+      { zh: 'Coursera 歡迎導引', en: 'Welcome to Coursera',
+        links: [{ label: 'Video', url: 'https://youtu.be/PojLL3E-zk0' },
+                { label: 'Registration', url: 'https://youtu.be/fyVP_UrFLCM' }] },
+      { zh: '班級基本資料表 & 分組資料表', en: 'Class Profile Form & Group Information Form' },
+      { zh: '自我介紹影片 — Draft Version（課後W1）', en: '1-min Self-Intro Video — Draft Version (post-W1)',
+        note: 'Your own voice' }
+    ]
+  },
+  {
+    w: 2,
+    title: { zh: '學習共識與 GenAI 工具', en: 'Common Ground on Learning & GenAI Tools' },
+    tags: [],
+    topics: [
+      { zh: 'World-Industry-Yourself (WIU)', en: 'World-Industry-Yourself (WIU)',
+        note: 'BA: Pre-W2 G1,G3,G5,G7',
+        links: [{ label: 'WIU Folder', url: 'https://drive.google.com/drive/folders/1_G4-gthsddspZyAIMgDzRQlnEGFzUn_z?usp=sharing' },
+                { label: 'Podcast EN', url: 'https://youtu.be/RVeT7DyKTYE' },
+                { label: 'Podcast ZH', url: 'https://youtu.be/ZpZ8ql7e3as' }] },
+      { zh: 'Thinking Upgrader (TU)', en: 'Thinking Upgrader (TU)',
+        note: 'BA: Pre-W2 G2,G4,G6,G8',
+        links: [{ label: 'TU Web', url: 'https://lolopodcast.github.io/Thinking-Upgrader/' },
+                { label: 'Podcast', url: 'https://youtu.be/p-CNjDzMO8I' }] },
+      { zh: 'GenAI 工具介紹與使用規範', en: 'GenAI Tools & AI Use Disclosure Policy',
+        subtopics: [
+          { zh: 'ChatGPT / Gemini / Claude / NotebookLM / D-ID / ElevenLabs / Gamma / Napkin / Mentimeter', en: 'ChatGPT / Gemini / Claude / NotebookLM / D-ID / ElevenLabs / Gamma / Napkin / Mentimeter' }
+        ]},
+      { zh: 'Coggle 協作心智圖工具介紹', en: 'Coggle Collaborative Mindmap Tool',
+        links: [{ label: 'Coggle Intro', url: 'https://youtu.be/OGNgdsLJAs' }] },
+      { zh: '各組建立 Coggle & NotebookLM（課後W2）', en: 'Create Group Coggle & NotebookLM (post-W2)', note: 'Add Prof. Lo & TAs' },
+      { zh: '自我介紹影片 — Revised Version（課後W2）', en: 'Self-Intro Video — Revised Version (post-W2)', note: 'AI-assisted' }
+    ]
+  },
+  {
+    w: 3,
+    title: { zh: '產品經理 · 職務描述 · 終端專案', en: 'Product Manager · Job Description · Term Project' },
+    tags: ['now', 'tp'],
+    topics: [
+      { zh: '產品經理 (PM) 與專案管理 (PjM) 介紹', en: 'Introduction to PM & Project Management (PjM)',
+        links: [{ label: 'PM Competencies', url: 'https://drive.google.com/drive/folders/1dPOjvuo5VDsq3z4tB9Wb3MEGNrZ5okoV?usp=drive_link' },
+                { label: 'PMMC Credit Program', url: 'https://youtu.be/tyyE5Fy0Vos' }] },
+      { zh: 'AGI 之後的世界', en: 'The Day After AGI — Hassabis & Amodei',
+        links: [{ label: 'Folder', url: 'https://drive.google.com/drive/folders/1hpbNwtBvIpAiqy7-EjR7bhL8l_R7vKAU?usp=drive_link' }] },
+      { zh: '職務描述 (JD) 與職能 (K/S/A) 介紹', en: 'Job Description (JD) & Competency (K/S/A)',
+        subtopics: [
+          { zh: '公司層級：公開資訊觀測站', en: 'Company-level: MOPS', link: { label: 'MOPS', url: 'https://mops.twse.com.tw/mops/web/index' } },
+          { zh: '產業層級：產業價值鏈資訊平台', en: 'Industry-level: IC Platform', link: { label: 'IC Platform', url: 'https://ic.tpex.org.tw/' } },
+          { zh: '國家層級：政府資料開放平台', en: 'Country-level: Open Government Data', link: { label: 'Data.gov.tw', url: 'https://data.gov.tw/' } }
+        ]},
+      { zh: '平台建議：104 人力銀行 & LinkedIn 註冊', en: 'Platform Sign-up: 104 Job Bank & LinkedIn (strongly suggested)' },
+      { zh: '證券開戶 & 交易 APP 操作', en: 'Securities Account Opening & Trading APP' },
+      { zh: '終端專案 (TP) — Single-Page Application 介紹', en: 'Term Project (TP) — SPA Introduction',
+        links: [{ label: 'TP Video Tutorial', url: 'https://youtu.be/dfygD7fQZP4?si=MyQ3uvf0kUM4yWyn' },
+                { label: 'Video Tools', url: 'https://www.youtube.com/watch?v=frAzxjjY1VQ' }],
+        subtopics: [
+          { zh: '範例1：1141 BNA & CDPS', en: 'Example 1: 1141 BNA & CDPS', link: { label: 'BNA & CDPS', url: 'https://ncnulolotas.github.io/interactivewebpagecompetition.github.io/' } },
+          { zh: '範例2：1141 PMCS', en: 'Example 2: 1141 PMCS', link: { label: 'PMCS', url: 'https://lolopodcast.github.io/1141-PMCS/' } }
+        ]}
+    ]
+  },
+  {
+    w: 4,
+    title: { zh: '創業與策略', en: 'Entrepreneurship and Strategy' },
+    tags: ['ent'],
+    preview: true,
+    topics: [
+      { zh: '[ENT-1] 創業課程介紹（G1&2；其餘 BA）', en: '[ENT-1] Introduction to ENT Course (G1&2; BA for others)',
+        subtopics: [{ zh: 'Video 0.1 ~ 0.3（19 分鐘）', en: 'Video 0.1 ~ 0.3 (19 min)' }] },
+      { zh: '[LN-1a] 策略入門基礎 — Corporate Governance Part 1（G3&4；其餘 BA）', en: '[LN-1a] Basics of Strategy & Corporate Governance Part 1 (G3&4; BA for others)',
+        links: [{ label: 'LN-1a Video', url: 'https://youtu.be/AXzVtjkU-sg' }] }
+    ]
+  }
+];
+
+// ── Build semester bar ──
+const track = document.getElementById('barTrack');
+for (let i = 1; i <= 18; i++) {
+  const seg = document.createElement('div');
+  seg.className = 'bar-seg';
+  if (i < CURRENT_WEEK) seg.classList.add('past');
+  if (i === CURRENT_WEEK) seg.classList.add('current');
+  seg.title = `Week ${i}`;
+  seg.onclick = () => {
+    if (i <= VISIBLE_WEEKS) {
+      const row = document.querySelector(`.week-row[data-week="${i}"]`);
+      if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); openRow(row); }
+    }
+  };
+  track.appendChild(seg);
+}
+
+// ── Render weeks ──
+let lang = 'zh';
+const schedule = document.getElementById('schedule');
+
+function renderWeeks() {
+  schedule.innerHTML = '';
+
+  weeks.forEach((wk, idx) => {
+    const row = document.createElement('div');
+    row.className = 'week-row';
+    row.dataset.week = wk.w;
+    row.dataset.tags = wk.tags.join(',');
+    if (wk.w === CURRENT_WEEK) row.classList.add('current-week');
+    if (wk.preview) row.classList.add('preview-week');
+    row.style.animationDelay = `${idx * 0.03}s`;
+
+    const tagHTML = wk.tags
+      .filter(t => t !== 'now')
+      .map(t => `<span class="wtag ${t}">${t === 'tp' ? 'Term Project' : t === 'peer' ? 'Peer Review' : t === 'sdl' ? 'SDL' : t.toUpperCase()}</span>`)
+      .join('');
+    const nowTag = wk.w === CURRENT_WEEK ? `<span class="wtag now">Current</span>` : '';
+    const previewTag = wk.preview ? `<span class="wtag preview">預習 Preview</span>` : '';
+
+    let topicsHTML = '<ul class="topic-list">';
+    wk.topics.forEach(t => {
+      const text = t[lang] || t.zh;
+      const linksHTML = (t.links || []).map(l =>
+        `<a href="${l.url}" target="_blank">${l.label} <i class="fas fa-external-link-alt" style="font-size:0.5rem"></i></a>`
+      ).join(' ');
+      const noteHTML = t.note ? `<span class="topic-note">${t.note}</span>` : '';
+
+      let subtopicsHTML = '';
+      if (t.subtopics && t.subtopics.length) {
+        subtopicsHTML = '<ul class="subtopic-list">';
+        t.subtopics.forEach(st => {
+          const stText = st[lang] || st.zh;
+          const stLink = st.link ? `<a href="${st.link.url}" target="_blank">${st.link.label}</a>` : '';
+          subtopicsHTML += `<li>${stText} ${stLink}</li>`;
+        });
+        subtopicsHTML += '</ul>';
+      }
+
+      topicsHTML += `
+        <li class="topic-item">
+          <div class="topic-bullet"></div>
+          <div>${text} ${noteHTML} ${linksHTML} ${subtopicsHTML}</div>
+        </li>`;
+    });
+    topicsHTML += '</ul>';
+
+    row.innerHTML = `
+      <div class="week-header" onclick="toggleRow(this.parentElement)">
+        <div class="week-num">W${wk.w}</div>
+        <div class="week-meta">
+          <div class="week-title">${wk.title[lang]}</div>
+          <div class="week-tags">${nowTag}${previewTag}${tagHTML}</div>
+        </div>
+        <i class="fas fa-chevron-down week-chevron"></i>
+      </div>
+      <div class="week-body">${topicsHTML}</div>
+    `;
+
+    schedule.appendChild(row);
+  });
+
+  // Auto-open current week and preview week
+  const cur = document.querySelector(`.week-row[data-week="${CURRENT_WEEK}"]`);
+  if (cur) openRow(cur);
+  const preview = document.querySelector(`.week-row.preview-week`);
+  if (preview) openRow(preview);
+}
+
+function openRow(row) { row.classList.add('open'); }
+function toggleRow(row) { row.classList.toggle('open'); }
+
+function filterWeeks(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.week-row').forEach(row => {
+    if (type === 'all') {
+      row.classList.remove('hidden');
+    } else {
+      const tags = (row.dataset.tags || '').split(',');
+      row.classList.toggle('hidden', !tags.includes(type));
+    }
+  });
+}
+
+const i18n = {
+  zh: {
+    heroEyebrow:  '課程時程 · 18 週',
+    heroTitle:    '課程藍圖',
+    heroSub:      '國際策略管理 (SMMC-EMI)<br>授課教師：駱世民 教授 &nbsp;·&nbsp; MGMT B15 &nbsp;·&nbsp; 1fgh &nbsp;(14:30–17:20)',
+    gradeHeader:  '成績配分',
+    gl1: '終端<br>專案', gl2: '同儕<br>評鑑', gl3: '小組<br>簡報', gl4: '課堂<br>參與',
+    barLabel:     '學期進度',
+    barProgress:  `第 ${CURRENT_WEEK} 週 / 共 18 週`,
+    noticeTxt:    '請同學預習 W4 — 創業與策略 課程內容，下週課堂使用。',
+    tabAll: '全部週次', tabTp: '終端專案', tabEnt: 'ENT', tabCs: '企業策略', tabPeer: '同儕評鑑',
+    lockedLabel:  'W5 – W18 &nbsp;·&nbsp; 內容將逐步開放',
+    lockedSub:    '尚未開放 · Stay tuned',
+    footerRight:  '機密文件 — 僅供內部使用',
+    langBtn:      'EN',
+  },
+  en: {
+    heroEyebrow:  'Course Schedule · 18 Weeks',
+    heroTitle:    'Course Roadmap',
+    heroSub:      'Strategic Management of Multinational Corporations (SMMC-EMI)<br>Instructor: Prof. Shihmin Lo &nbsp;·&nbsp; MGMT B15 &nbsp;·&nbsp; 1fgh &nbsp;(14:30–17:20)',
+    gradeHeader:  'Grading Structure',
+    gl1: 'Term<br>Project', gl2: 'Peer<br>Review', gl3: 'Group<br>Present', gl4: 'Partici-<br>pation',
+    barLabel:     'Semester Progress',
+    barProgress:  `Week ${CURRENT_WEEK} / 18`,
+    noticeTxt:    'Please preview W4 — Entrepreneurship and Strategy before next class.',
+    tabAll: 'All Weeks', tabTp: 'Term Project', tabEnt: 'ENT', tabCs: 'Corp. Strategy', tabPeer: 'Peer Review',
+    lockedLabel:  'W5 – W18 &nbsp;·&nbsp; Content will be released progressively',
+    lockedSub:    'Not yet released · Stay tuned',
+    footerRight:  'Confidential — Internal Use Only',
+    langBtn:      '中文',
+  }
+};
+
+function updateStaticText() {
+  const t = i18n[lang];
+  document.getElementById('heroEyebrow').textContent  = t.heroEyebrow;
+  document.getElementById('heroTitle').textContent    = t.heroTitle;
+  document.getElementById('heroSub').innerHTML        = t.heroSub;
+  document.getElementById('gradeHeader').textContent  = t.gradeHeader;
+  document.getElementById('gl1').innerHTML = t.gl1;
+  document.getElementById('gl2').innerHTML = t.gl2;
+  document.getElementById('gl3').innerHTML = t.gl3;
+  document.getElementById('gl4').innerHTML = t.gl4;
+  document.getElementById('barLabel').textContent     = t.barLabel;
+  document.getElementById('barProgress').textContent  = t.barProgress;
+  document.getElementById('noticeTxt').innerHTML      = t.noticeTxt;
+  document.getElementById('tab-all').textContent  = t.tabAll;
+  document.getElementById('tab-tp').textContent   = t.tabTp;
+  document.getElementById('tab-ent').textContent  = t.tabEnt;
+  document.getElementById('tab-cs').textContent   = t.tabCs;
+  document.getElementById('tab-peer').textContent = t.tabPeer;
+  document.getElementById('lockedLabel').innerHTML = t.lockedLabel;
+  document.getElementById('lockedSub').textContent = t.lockedSub;
+  document.getElementById('footerRight').textContent  = t.footerRight;
+  document.getElementById('langBtn').textContent      = t.langBtn;
+}
+
+function toggleLang() {
+  lang = lang === 'zh' ? 'en' : 'zh';
+  updateStaticText();
+  renderWeeks();
+}
+
+function toggleTheme() {
+  document.documentElement.classList.toggle('light');
+  const isLight = document.documentElement.classList.contains('light');
+  document.getElementById('themeIcon').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+updateStaticText();
+renderWeeks();
+</script>
+</body>
+</html>
