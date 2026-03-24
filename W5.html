@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom CCTV Adventure - IBS v3.7</title>
+    <title>Classroom CCTV Adventure - IBS v3.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -92,7 +92,6 @@
             background-size: cover; opacity: 0.05; display: none; z-index: 50; pointer-events: none;
         }
 
-        /* Modal 樣式 */
         #feedback-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center;
@@ -101,13 +100,15 @@
             background: #111; border: 4px solid var(--cctv-green); padding: 30px;
             max-width: 400px; width: 90%; position: relative;
         }
+
+        #content-area::-webkit-scrollbar { width: 6px; }
+        #content-area::-webkit-scrollbar-thumb { background: var(--cctv-green); border-radius: 10px; }
     </style>
 </head>
 <body data-theme="dark">
 
 <div class="crt-overlay"></div>
 
-<!-- 回饋工具面板 (Modal) -->
 <div id="feedback-modal">
     <div class="modal-box text-center">
         <div class="pixel-font text-xs mb-6" style="color: var(--cctv-green)" id="modal-title">心得回饋 FEEDBACK</div>
@@ -135,7 +136,7 @@
         </div>
         
         <div class="flex flex-col items-end space-y-2">
-            <div class="pixel-font text-[8px] md:text-xs opacity-50">v3.7_IBS_FINAL</div>
+            <div class="pixel-font text-[8px] md:text-xs opacity-50">v3.9_LINK_EMBEDDED</div>
             <div class="flex space-x-2">
                 <button onclick="openModal()" class="btn-ui pixel-font" id="btn-tool" title="心得回饋">🛠️</button>
                 <button onclick="toggleLang()" class="btn-ui pixel-font" id="btn-lang">EN</button>
@@ -160,13 +161,13 @@
     const uiStrings = {
         zh: { 
             live: "直播中", lang: "EN", loading: "-- 正在提取頻道數據 --", 
-            statusLabel: "檔案狀態", statusVal: "已存檔 / 穩定", scan: "▼ 滾動查看更多",
+            statusLabel: "檔案狀態", statusVal: "已存檔 / 穩定", scan: "▼ 點擊連結開始預習下一階段",
             modalTitle: "心得回饋", btnCopy: "複製地址", btnOpen: "開啟郵件程式",
             ch1: "CH1: 吳家瑄", ch2: "CH2: 課堂報告", ch3: "CH3: 林筠芳", ch4: "CH4: 下周預習"
         },
         en: { 
             live: "LIVE", lang: "繁中", loading: "-- EXTRACTING CHANNEL DATA --", 
-            statusLabel: "FILE_STATUS", statusVal: "ARCHIVED / STABLE", scan: "▼ SCROLL FOR MORE",
+            statusLabel: "FILE_STATUS", statusVal: "ARCHIVED / STABLE", scan: "▼ CLICK LINKS FOR NEXT PREP",
             modalTitle: "FEEDBACK", btnCopy: "COPY EMAIL", btnOpen: "OPEN MAIL APP",
             ch1: "CH1: Chia-Hsuan", ch2: "CH2: REPORT", ch3: "CH3: Yun-Fang", ch4: "CH4: PREP"
         }
@@ -219,13 +220,21 @@
             icon: "🔍", color: "#ffffff",
             zh: {
                 title: "下周課前預習: 追求商機與承擔風險",
-                desc: "預習核心主題。探討創業者如何敏銳察覺市場缺口，並在動態環境中進行環境與產業分析。",
-                points: ["🔍 商機識別：從生活痛點或產業結構變化中發掘潛在商業概念", "⚖️ 風險評估：區分「盲目冒險」與「計算後的風險」(Calculated Risk)", "🛡️ 環境分析：運用 PESTEL 或五力分析了解產業競爭態勢與合作動態", "📈 競合動力：在競爭中尋求合作，最大化商機的價值與影響力"]
+                desc: "點擊下方連結進入預習內容。探討創業者如何敏銳察覺市場缺口，並在動態環境中進行環境與產業分析。",
+                points: [
+                    `<a href="https://lolopodcast.github.io/Entrepreneurship1-2-Opportunity/" target="_blank" class="hover:underline text-blue-400">🔗 預習 1：Opportunity & Business Concept</a>`,
+                    `<a href="https://lolopodcast.github.io/SMMC-LN3-Environment-Industry-Analysis/" target="_blank" class="hover:underline text-blue-400">🔗 預習 2：Environment & Industry Analysis</a>`,
+                    `<a href="https://lolopodcast.github.io/SMMC-LN4-Co-opetitive-Dynamics/#" target="_blank" class="hover:underline text-blue-400">🔗 預習 3：Co-opetitive Dynamics</a>`
+                ]
             },
             en: {
                 title: "Next Week Prep: Opportunity & Risk",
-                desc: "Pre-class preparation. Exploring how entrepreneurs sense market gaps and analyze the environment and industry dynamics.",
-                points: ["🔍 Opportunity Identification: Discovering business concepts from pain points", "⚖️ Risk Bearing: Distinguishing between blind risk and Calculated Risk", "🛡️ Environmental Analysis: Using frameworks to understand industry competition", "📈 Co-opetitive Dynamics: Seeking cooperation in competition to maximize value"]
+                desc: "Click links below to access prep materials. Exploring market gap sensing, industry analysis, and co-opetitive dynamics.",
+                points: [
+                    `<a href="https://lolopodcast.github.io/Entrepreneurship1-2-Opportunity/" target="_blank" class="hover:underline text-blue-400">🔗 Prep 1: Opportunity & Business Concept</a>`,
+                    `<a href="https://lolopodcast.github.io/SMMC-LN3-Environment-Industry-Analysis/" target="_blank" class="hover:underline text-blue-400">🔗 Prep 2: Environment & Industry Analysis</a>`,
+                    `<a href="https://lolopodcast.github.io/SMMC-LN4-Co-opetitive-Dynamics/#" target="_blank" class="hover:underline text-blue-400">🔗 Prep 3: Co-opetitive Dynamics</a>`
+                ]
             },
             photo: null
         }
