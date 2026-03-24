@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom CCTV Adventure - IBS v3.7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        :root {
+            --cctv-green: #00ff41;
+            --cctv-bg: #0a0a0a;
+            --cctv-card-bg: rgba(0, 255, 65, 0.1);
+            --text-main: #00ff41;
+            --overlay-opacity: 0.2;
+        }
+
+        [data-theme="light"] {
+            --cctv-green: #2c3e50;
+            --cctv-bg: #f8f9fa;
+            --cctv-card-bg: rgba(44, 62, 80, 0.05);
+            --text-main: #2c3e50;
+            --overlay-opacity: 0.05;
+        }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none; z-index: 100; opacity: var(--overlay-opacity);
+        }
+
+        @keyframes flicker { 0% { opacity: 0.98; } 5% { opacity: 0.95; } 100% { opacity: 1; } }
+
+        .screen-container {
+            animation: flicker 0.15s infinite;
+            border: 10px solid #222;
+            background: var(--cctv-bg);
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .screen-container { border-width: 20px; border-radius: 40px; margin: 20px; height: calc(100vh - 40px); }
+        }
+
+        .rec-dot {
+            width: 12px; height: 12px; background-color: #ff0000; border-radius: 50%;
+            box-shadow: 0 0 10px #ff0000; animation: blink 1s steps(2) infinite;
+        }
+        @keyframes blink { from { opacity: 1; } to { opacity: 0; } }
+
+        .btn-ui {
+            background: #222; border: 1px solid var(--cctv-green); color: var(--cctv-green);
+            padding: 5px 10px; font-size: 10px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-ui:hover, .btn-ui.active { background: var(--cctv-green); color: #000; }
+
+        .game-card {
+            background: var(--cctv-card-bg); border: 2px solid var(--cctv-green);
+            padding: 20px; width: 100%; max-width: 900px; box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .photo-frame {
+            width: 100%; max-width: 280px; aspect-ratio: 1/1; border: 4px solid var(--cctv-green);
+            background: #111; overflow: hidden; image-rendering: pixelated;
+        }
+
+        .static-noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://media.giphy.com/media/oEI9uWUicG3vA3InS9/giphy.gif');
+            background-size: cover; opacity: 0.05; display: none; z-index: 50; pointer-events: none;
+        }
+
+        /* Modal 樣式 */
+        #feedback-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #111; border: 4px solid var(--cctv-green); padding: 30px;
+            max-width: 400px; width: 90%; position: relative;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="crt-overlay"></div>
+
+<!-- 回饋工具面板 (Modal) -->
+<div id="feedback-modal">
+    <div class="modal-box text-center">
+        <div class="pixel-font text-xs mb-6" style="color: var(--cctv-green)" id="modal-title">心得回饋 FEEDBACK</div>
+        <p class="text-xs mb-4 opacity-70">Email Address:</p>
+        <div class="bg-black/50 p-2 border border-dashed border-white/20 text-[10px] mb-6 select-all font-mono">
+            s112212015@mail1.ncnu.edu.tw
+        </div>
+        <div class="flex flex-col space-y-3">
+            <button onclick="copyEmail()" class="btn-ui pixel-font text-[8px]" id="btn-copy">複製地址 COPY EMAIL</button>
+            <button onclick="triggerMailTo()" class="btn-ui pixel-font text-[8px]" id="btn-open-mail">開啟郵件程式 OPEN MAIL</button>
+            <button onclick="closeModal()" class="btn-ui pixel-font text-[8px] opacity-50 mt-4">關閉 CLOSE</button>
+        </div>
+        <div id="copy-success" class="mt-4 text-[8px] pixel-font text-white hidden animate-bounce">SUCCESSFULLY COPIED!</div>
+    </div>
+</div>
+
+<div class="screen-container">
+    <div id="static-overlay" class="static-noise"></div>
+    
+    <div class="p-4 md:p-6 flex justify-between items-start z-10 w-full shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="rec-dot"></div>
+            <div class="pixel-font text-[10px] md:text-sm">REC ● <span id="ui-live">LIVE</span></div>
+            <div id="timestamp" class="text-xs md:text-lg opacity-80 hidden sm:block font-mono">2026-03-24 20:30:00</div>
+        </div>
+        
+        <div class="flex flex-col items-end space-y-2">
+            <div class="pixel-font text-[8px] md:text-xs opacity-50">v3.7_IBS_FINAL</div>
+            <div class="flex space-x-2">
+                <button onclick="openModal()" class="btn-ui pixel-font" id="btn-tool" title="心得回饋">🛠️</button>
+                <button onclick="toggleLang()" class="btn-ui pixel-font" id="btn-lang">EN</button>
+                <button onclick="toggleTheme()" class="btn-ui pixel-font" id="btn-theme">MODE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-area" class="flex-grow flex flex-col justify-start items-center px-4 py-4 md:px-10 overflow-y-auto pb-32"></div>
+
+    <div class="absolute bottom-0 left-0 w-full p-6 flex flex-wrap justify-center gap-2 md:gap-3 z-20 bg-gradient-to-t from-black/80 to-transparent sm:from-transparent">
+        <button onclick="switchChannel(1)" id="btn-1" class="btn-ui active pixel-font text-[8px] md:text-[10px]">CH1: 吳家瑄</button>
+        <button onclick="switchChannel(2)" id="btn-2" class="btn-ui pixel-font text-[8px] md:text-[10px]">CH2: 課堂報告</button>
+        <button onclick="switchChannel(3)" id="btn-3" class="btn-ui pixel-font text-[8px] md:text-[10px]">CH3: 林筠芳</button>
+        <button onclick="switchChannel(4)" id="btn-4" class="btn-ui pixel-font text-[8px] md:text-[10px]">CH4: 下周預習</button>
+    </div>
+</div>
+
+<textarea id="temp-copy" style="position:fixed;top:-100px;"></textarea>
+
+<script>
+    const uiStrings = {
+        zh: { 
+            live: "直播中", lang: "EN", loading: "-- 正在提取頻道數據 --", 
+            statusLabel: "檔案狀態", statusVal: "已存檔 / 穩定", scan: "▼ 滾動查看更多",
+            modalTitle: "心得回饋", btnCopy: "複製地址", btnOpen: "開啟郵件程式",
+            ch1: "CH1: 吳家瑄", ch2: "CH2: 課堂報告", ch3: "CH3: 林筠芳", ch4: "CH4: 下周預習"
+        },
+        en: { 
+            live: "LIVE", lang: "繁中", loading: "-- EXTRACTING CHANNEL DATA --", 
+            statusLabel: "FILE_STATUS", statusVal: "ARCHIVED / STABLE", scan: "▼ SCROLL FOR MORE",
+            modalTitle: "FEEDBACK", btnCopy: "COPY EMAIL", btnOpen: "OPEN MAIL APP",
+            ch1: "CH1: Chia-Hsuan", ch2: "CH2: REPORT", ch3: "CH3: Yun-Fang", ch4: "CH4: PREP"
+        }
+    };
+
+    const channels = {
+        1: {
+            icon: "🌸", color: "#ff4444",
+            zh: {
+                title: "吳家瑄學姊 - 職場經驗分享",
+                desc: "國企系應屆畢業生。分享從零壹科技實習轉職兆利科技的心路歷程，強調勇氣與改變的重要性。",
+                points: ["🌱 經歷：零壹科技 PM 實習生 -> 兆利科技資深專員", "🌱 金句：『其實可能沒有許多原因，只是需要改變的勇氣。』", "🌱 職掌：負責報價、採購、發包與會計處理", "🌱 洞察：深入機構樞紐產業鏈，掌握 95% 關鍵件業務"]
+            },
+            en: {
+                title: "Wu Chia-Hsuan - Career Sharing",
+                desc: "Graduating student of IBS. Shared her journey from Zerone Tech intern to Jarllytec specialist, emphasizing the courage to change.",
+                points: ["🌱 Path: Zerone PM Intern -> Jarllytec Senior Specialist", "🌱 Quote: 'There might not be many reasons, just the courage to change.'", "🌱 Tasks: Quotations, procurement, outsourcing & accounting", "🌱 Insight: Mastered hinge mechanism supply chain (95% market share)"]
+            },
+            photo: "https://lh3.googleusercontent.com/u/0/d/1RG8ncs9ZvATUkjKGacEg0zrUvclggiKj"
+        },
+        2: {
+            icon: "⛏️", color: "#00aaaa",
+            zh: {
+                title: "課堂報告 - 創業家精神導論",
+                desc: "本週小組專案紀錄。解析創業者的核心思維，如何從機會識別到資源整合並實踐商業模式。",
+                points: ["💎 創業定義：識別市場機會並整合資源，不只是開創事業更是一種精神", "💎 核心特質：具備高度自主性、前瞻性以及對於風險的承擔能力", "💎 實踐流程：包含機會識別、計畫制定、資源獲取與事業管理", "💎 報告重點：如何將創意思維轉化為可持續經營的商業模式"]
+            },
+            en: {
+                title: "Introduction to Entrepreneurship",
+                desc: "Group project report. Discussing mindset, opportunity identification, and resource integration to build business models.",
+                points: ["💎 Def: Identifying market opportunities and integrating resources proactively", "💎 Traits: High autonomy, innovativeness, and risk-taking capability", "💎 Process: Opportunity ID -> Planning -> Acquisition -> Management", "💎 Focus: Converting creative thinking into sustainable business plans"]
+            },
+            photo: null
+        },
+        3: {
+            icon: "🚩", color: "#f8d800",
+            zh: {
+                title: "林筠芳學姊 - 實習實戰與反思",
+                desc: "國企四 IBS 學生。分享於 Cimforce 上博科技擔任 PM 與 HR 雙角色的經驗，聚焦工作方法與溝通效率。",
+                points: ["🚩 角色：PM 需釐清模糊並對齊認知；HR 則需平衡效率與需求洞察", "🚩 方法：任務確認四部曲——目的、相關人、時間、做好標準", "🚩 反思：從私訊溝通改為群組公開，有效降低資訊落差成本", "🚩 建議：主動讓別人放心、溝通讓別人聽懂、細心降低協作成本"]
+            },
+            en: {
+                title: "Lin Yun-Fang - Internship Reflection",
+                desc: "Senior IBS student. Shared dual PM/HR role experience at Cimforce, focusing on methodology and efficiency.",
+                points: ["🚩 Roles: PM clarifies ambiguity; HR balances admin efficiency & insight", "🚩 Method: 4-Step Task Confirm—Purpose, Stakeholders, Timing, Standards", "🚩 Lessons: Shift from private DMs to group chats to reduce info gaps", "🚩 Tips: Proactive reporting builds trust; clear minutes show professionalism"]
+            },
+            photo: "https://lh3.googleusercontent.com/u/0/d/1M-ngMljZ_LiYliYiJA9mjF79wH1up89q"
+        },
+        4: {
+            icon: "🔍", color: "#ffffff",
+            zh: {
+                title: "下周課前預習: 追求商機與承擔風險",
+                desc: "預習核心主題。探討創業者如何敏銳察覺市場缺口，並在動態環境中進行環境與產業分析。",
+                points: ["🔍 商機識別：從生活痛點或產業結構變化中發掘潛在商業概念", "⚖️ 風險評估：區分「盲目冒險」與「計算後的風險」(Calculated Risk)", "🛡️ 環境分析：運用 PESTEL 或五力分析了解產業競爭態勢與合作動態", "📈 競合動力：在競爭中尋求合作，最大化商機的價值與影響力"]
+            },
+            en: {
+                title: "Next Week Prep: Opportunity & Risk",
+                desc: "Pre-class preparation. Exploring how entrepreneurs sense market gaps and analyze the environment and industry dynamics.",
+                points: ["🔍 Opportunity Identification: Discovering business concepts from pain points", "⚖️ Risk Bearing: Distinguishing between blind risk and Calculated Risk", "🛡️ Environmental Analysis: Using frameworks to understand industry competition", "📈 Co-opetitive Dynamics: Seeking cooperation in competition to maximize value"]
+            },
+            photo: null
+        }
+    };
+
+    let currentLang = 'zh', currentTheme = 'dark', activeChannel = 1;
+    const contentArea = document.getElementById('content-area');
+
+    function openModal() { document.getElementById('feedback-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('feedback-modal').style.display = 'none'; document.getElementById('copy-success').classList.add('hidden'); }
+
+    function copyEmail() {
+        const text = "s112212015@mail1.ncnu.edu.tw";
+        const temp = document.getElementById('temp-copy');
+        temp.value = text; temp.select();
+        document.execCommand('copy');
+        document.getElementById('copy-success').classList.remove('hidden');
+    }
+
+    function triggerMailTo() {
+        const email = "s112212015@mail1.ncnu.edu.tw";
+        const subject = currentLang === 'zh' ? "課堂回顧心得回饋" : "Classroom CCTV Feedback";
+        window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}`, '_blank');
+    }
+
+    function toggleLang() { currentLang = currentLang === 'zh' ? 'en' : 'zh'; renderUI(); switchChannel(activeChannel, true); }
+    function toggleTheme() { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', currentTheme); switchChannel(activeChannel, true); }
+
+    function renderUI() {
+        const ui = uiStrings[currentLang];
+        document.getElementById('ui-live').innerText = ui.live;
+        document.getElementById('btn-lang').innerText = ui.lang;
+        document.getElementById('modal-title').innerText = `${ui.modalTitle} FEEDBACK`;
+        document.getElementById('btn-copy').innerText = `${ui.btnCopy} COPY EMAIL`;
+        document.getElementById('btn-open-mail').innerText = `${ui.btnOpen} OPEN MAIL APP`;
+        ['1','2','3','4'].forEach(id => document.getElementById(`btn-${id}`).innerText = ui[`ch${id}`]);
+    }
+
+    function switchChannel(id, noNoise = false) {
+        activeChannel = id;
+        if (!noNoise) {
+            document.getElementById('static-overlay').style.display = 'block';
+            setTimeout(() => { document.getElementById('static-overlay').style.display = 'none'; }, 300);
+            contentArea.scrollTo(0, 0); 
+        }
+        document.querySelectorAll('.btn-ui').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${id}`).classList.add('active');
+
+        const data = channels[id], content = data[currentLang], ui = uiStrings[currentLang];
+        let photoSection = data.photo ? `<div class="photo-frame mb-6 md:mb-0 md:mr-6"><img src="${data.photo}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='[PHOTO_LOST]'"></div>` : '';
+
+        contentArea.innerHTML = `
+            <div class="animate-pulse mb-4 text-[10px] opacity-60 pixel-font mt-4" style="color:${data.color}">${ui.loading}</div>
+            <h1 class="pixel-font text-lg md:text-2xl mb-4" style="color:${data.color}">${content.title}</h1>
+            <p class="mb-8 opacity-80 max-w-2xl text-xs md:text-base leading-relaxed text-center px-2">${content.desc}</p>
+            <div class="game-card flex flex-col md:flex-row items-center md:items-start p-6" style="border-color:${data.color}">
+                ${photoSection}
+                <div class="flex-grow w-full">
+                    <div class="flex items-center space-x-3 mb-4"><span class="text-2xl">${data.icon}</span><div class="h-px bg-current opacity-20 flex-grow"></div></div>
+                    <ul class="space-y-4 text-xs md:text-sm">
+                        ${content.points.map(p => `<li class="flex items-start space-x-2"><span style="color:${data.color}">►</span><span>${p}</span></li>`).join('')}
+                    </ul>
+                    <div class="mt-8">
+                        <div class="flex justify-between items-end mb-1 text-[8px] md:text-[10px] pixel-font"><span class="opacity-50">${ui.statusLabel}</span><span style="color:${data.color}">${ui.statusVal}</span></div>
+                        <div class="health-bar" style="border-color:${data.color}55"><div class="health-fill" style="background:${data.color};width:100%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 text-[10px] opacity-40 pixel-font animate-bounce">${ui.scan}</div>
+        `;
+    }
+
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('timestamp').innerText = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    }, 1000);
+
+    window.onload = () => { renderUI(); switchChannel(1); };
+</script>
+
+</body>
+</html>
