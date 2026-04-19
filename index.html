@@ -1,0 +1,498 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, MessageSquare, Plus, X, Pin, Clock, BookOpen, AlertCircle, Trash2, ExternalLink, ChevronDown, ChevronUp, Book, Menu, History } from 'lucide-react';
+
+// --- 雙語字典 (i18n) ---
+const translations = {
+  zh: {
+    courseName: '國際策略管理 (SMMC-EMI)',
+    courseSub: '1142 學期 • 課後公告與便利貼佈告欄',
+    teacher: '授課教師：駱世民 教授',
+    langBtn: 'EN',
+    addNoticeBtn: '新增公告',
+    syllabusTitle: '課綱 Syllabus',
+    contentLocked: '內容將逐步開放',
+    noDetails: '目前暫無詳細資訊',
+    boardTitle: '即時公告與便利貼',
+    emptyBoardTitle: '本週目前沒有任何額外公告',
+    emptyBoardBtn: '+ 新增第一張便利貼',
+    modalAddTitle: '新增 W{week} 便利貼',
+    noteTypeLabel: '公告類型',
+    authorLabel: '發布角色',
+    contentLabel: '便利貼內容',
+    contentPlaceholder: '請輸入要提醒學生的事項、作業內容或補充說明...',
+    cancelBtn: '取消',
+    submitBtn: '貼上佈告欄',
+    confirmDelTitle: '確認撕下便利貼',
+    confirmDelDesc: '確定要撕下這張便利貼嗎？這個動作無法復原。',
+    confirmDelBtn: '確定刪除',
+    tagNow: '本週',
+    archiveBtn: '複習過去週次',
+    archiveClose: '關閉選單',
+  },
+  en: {
+    courseName: 'Strategic Management (SMMC-EMI)',
+    courseSub: '1142 Spring • Notice & Bulletin Board',
+    teacher: 'Instructor: Prof. Shihmin Lo',
+    langBtn: '中文',
+    addNoticeBtn: 'Add Note',
+    syllabusTitle: 'Syllabus',
+    contentLocked: 'Content Locked',
+    noDetails: 'Stay tuned',
+    boardTitle: 'Notice Board',
+    emptyBoardTitle: 'No notes for this week yet.',
+    emptyBoardBtn: '+ Add the first note',
+    modalAddTitle: 'Add Note to W{week}',
+    noteTypeLabel: 'Note Type',
+    authorLabel: 'Author',
+    contentLabel: 'Content',
+    contentPlaceholder: 'Enter reminders, assignments, or supplementary info...',
+    cancelBtn: 'Cancel',
+    submitBtn: 'Post Note',
+    confirmDelTitle: 'Delete Note',
+    confirmDelDesc: 'Are you sure you want to remove this note? This cannot be undone.',
+    confirmDelBtn: 'Delete',
+    tagNow: 'Current',
+    archiveBtn: 'Review Past Weeks',
+    archiveClose: 'Close Menu',
+  }
+};
+
+// --- 根據 PDF 課綱匯入的 18 週課程資料與詳細內容 ---
+const initialWeeks = [
+  { 
+    id: 1, 
+    title: { zh: '第 1 週', en: 'Week 1' }, 
+    topic: { zh: '課程導覽', en: 'Course Orientation' }, 
+    date: '2026/02/23',
+    tags: [],
+    details: [
+      { id: 'w1-d1', text: { zh: "教授個人介紹 & Short Bio", en: "Prof. Lo's Introduction & Short Bio" }, links: [{ label: 'Short Bio', url: 'https://drive.google.com/file/d/10UeqOG2sax8frL12roTeDqqh2a6x1/view?usp=drive_link' }, { label: 'YouTube', url: 'https://youtube.com/@shihminlo6097' }] },
+      { id: 'w1-d2', text: { zh: "1142 SMMC-EMI 大綱概覽", en: "Syllabus Overview of 1142 SMMC-EMI" } },
+      { id: 'w1-d3', text: { zh: "Google 雲端硬碟 & Moodle / BBB 介紹", en: "Google Shared Drives & Moodle/BBB Introduction" } },
+      { id: 'w1-d4', text: { zh: "Coursera 歡迎導引", en: "Welcome to Coursera" }, links: [{ label: 'Video', url: 'https://youtu.be/PojLL3E-zk0' }] },
+      { id: 'w1-d5', text: { zh: "班級基本資料表 & 分組資料表", en: "Class Profile Form & Group Information Form" } },
+      { id: 'w1-d6', text: { zh: "自我介紹影片 — Draft Version（課後W1）", en: "1-min Self-Intro Video — Draft Version (post-W1)" }, note: { zh: '請用自己的聲音', en: 'Your own voice' } }
+    ]
+  },
+  { 
+    id: 2, 
+    title: { zh: '第 2 週', en: 'Week 2' }, 
+    topic: { zh: '學習共識與 GenAI 工具', en: 'Common Ground on Learning & GenAI' }, 
+    date: '2026/03/02',
+    tags: [],
+    details: [
+      { id: 'w2-d1', text: { zh: 'World-Industry-Yourself (WIU)', en: 'World-Industry-Yourself (WIU)' }, note: { zh: 'BA: Pre-W2 G1,G3,G5,G7', en: 'BA: Pre-W2 G1,G3,G5,G7' }, links: [{ label: 'WIU Folder', url: 'https://drive.google.com/drive/folders/1_G4-gthsddspZyAIMgDzRQlnEGFzUn_z?usp=sharing' }] },
+      { id: 'w2-d2', text: { zh: 'Thinking Upgrader (TU)', en: 'Thinking Upgrader (TU)' }, links: [{ label: 'TU Web', url: 'https://lolopodcast.github.io/Thinking-Upgrader/' }] },
+      { id: 'w2-d3', text: { zh: 'GenAI 工具介紹與使用規範', en: 'GenAI Tools & AI Use Disclosure Policy' }, subtopics: [{ zh: 'ChatGPT / Gemini / Claude / NotebookLM / D-ID / ElevenLabs / Gamma / Napkin', en: 'ChatGPT / Gemini / Claude / NotebookLM / D-ID / ElevenLabs / Gamma / Napkin' }] },
+      { id: 'w2-d4', text: { zh: 'Coggle 協作心智圖工具介紹', en: 'Coggle Collaborative Mindmap Tool' }, links: [{ label: 'Coggle Intro', url: 'https://youtu.be/OGNgdsLJAs' }] },
+      { id: 'w2-d5', text: { zh: '各組建立 Coggle & NotebookLM（課後W2）', en: 'Create Group Coggle & NotebookLM (post-W2)' } }
+    ]
+  },
+  { 
+    id: 3, 
+    title: { zh: '第 3 週', en: 'Week 3' }, 
+    topic: { zh: '產品經理 · 職務描述 · 終端專案', en: 'Product Manager (PM), JD & TP' }, 
+    date: '2026/03/09',
+    tags: [],
+    details: [
+       { id: 'w3-d1', text: { zh: '產品經理 (PM) 與專案管理 (PjM) 介紹', en: 'Introduction to PM & Project Management (PjM)' }, links: [{ label: 'PM Competencies', url: 'https://drive.google.com/drive/folders/1dPOjvuo5VDsq3z4tB9Wb3MEGNrZ5okoV?usp=drive_link' }] },
+       { id: 'w3-d2', text: { zh: 'AGI 之後的世界', en: 'The Day After AGI — Hassabis & Amodei' } },
+       { id: 'w3-d3', text: { zh: '職務描述 (JD) 與職能 (K/S/A) 介紹', en: 'Job Description (JD) & Competency (K/S/A)' }, subtopics: [{ zh: '公司層級：公開資訊觀測站', en: 'Company-level: MOPS' }, { zh: '產業層級：產業價值鏈資訊平台', en: 'Industry-level: IC Platform' }, { zh: '國家層級：政府資料開放平台', en: 'Country-level: Open Government Data' }] },
+       { id: 'w3-d4', text: { zh: '平台建議：104 人力銀行 & LinkedIn 註冊', en: 'Platform Sign-up: 104 Job Bank & LinkedIn' } },
+       { id: 'w3-d5', text: { zh: '證券開戶 & 交易 APP 操作', en: 'Securities Account Opening & Trading APP' } },
+       { id: 'w3-d6', text: { zh: '終端專案 (TP) — SPA 介紹', en: 'Term Project (TP) — SPA Introduction' }, links: [{ label: 'TP Video Tutorial', url: 'https://youtu.be/dfygD7fQZP4?si=MyQ3uvf0kUM4yWyn' }] }
+    ]
+  },
+  { 
+    id: 4, 
+    title: { zh: '第 4 週', en: 'Week 4' }, 
+    topic: { zh: '創業與策略', en: 'Entrepreneurship and Strategy' }, 
+    date: '2026/03/16',
+    tags: ['ent'],
+    details: [
+      { id: 'w4-d1', text: { zh: '[ENT-1] 創業課程介紹', en: '[ENT-1] Introduction to ENT Course (G1&2; BA for others)' }, subtopics: [{ zh: 'Video 0.1 ~ 0.3 (19 分鐘)', en: 'Video 0.1 ~ 0.3 (19 min)' }] },
+      { id: 'w4-d2', text: { zh: '[LN-1a] 策略入門基礎', en: '[LN-1a] The Basics of Strategy & Corporate Governance Part 1 (G3&4; BA for others)' }, links: [{ label: 'LN-1a Video', url: 'https://youtu.be/AXzVtjkU-sg' }] }
+    ]
+  },
+  { 
+    id: 5, 
+    title: { zh: '第 5 週', en: 'Week 5' }, 
+    topic: { zh: '創業家', en: 'Entrepreneurs' }, 
+    date: '2026/03/23', 
+    tags: ['ent'], 
+    details: [
+      { id: 'w5-d1', text: { zh: '[ENT-2] 創業精神介紹', en: '[ENT-2] Introduction to Entrepreneurship (Group 5&6; BA for Others)' }, subtopics: [{ zh: 'Video 1.1~1.7 (84 分鐘)', en: 'Video 1.1~1.7 (84 minutes)' }] },
+      { id: 'w5-d2', text: { zh: '[LN-2] VPC 架構與商業模式', en: '[LN-2] VPC Framework & Business Model (Group 7&8; BA for Others)' } }
+    ] 
+  },
+  { 
+    id: 6, 
+    title: { zh: '第 6 週', en: 'Week 6' }, 
+    topic: { zh: '機會尋求與風險承擔', en: 'Opportunity-seeking and Risk-bearing' }, 
+    date: '2026/03/30', 
+    tags: ['ent'], 
+    details: [
+      { id: 'w6-d1', text: { zh: '[ENT-3] 機會分析', en: '[ENT-3] Opportunity Analysis (Group 1&2; BA for Others)' }, subtopics: [{ zh: 'Video 2-1~2.6 (63 分鐘)', en: 'Video 2-1~2.6 (63 minutes)' }] },
+      { id: 'w6-d2', text: { zh: '[LN-3 & LN-4] 外部分析', en: '[LN-3 & LN-4] External Analysis (Group 3&4; BA for Others)' }, subtopics: [{ zh: 'LN3 - 總體環境與產業分析', en: 'LN3 - The General Environment & Industry Analysis' }, { zh: 'LN4 - 競爭分析與競合動態', en: 'LN4 - Competitive Analysis & Co-opetitive Dynamics' }] }
+    ] 
+  },
+  { 
+    id: 7, 
+    title: { zh: '第 7 週', en: 'Week 7' }, 
+    topic: { zh: '(清明連假) 期中同儕審查與 TP 提案', en: '(Tomb-Sweeping Day off) Midterm Peer Review & TP Proposal' }, 
+    date: '2026/04/06', 
+    tags: ['peer', 'tp'], 
+    details: [
+      { id: 'w7-d1', text: { zh: '期中同儕審查', en: 'Midterm Peer Review (Group #All)' } },
+      { id: 'w7-d2', text: { zh: '在 Moodle 上登記組別的 TP 公司', en: 'Sign up your group TP company on Moodle (Group #All)' } },
+      { id: 'w7-d3', text: { zh: '[TP0] TP 提案 - 已登記公司、公司概況與財務績效', en: '[TP0] TP Proposal - Signed-up, Company Overview & Financial Performance (Group #All)' }, subtopics: [{ zh: '(1) 兩則最新新聞', en: '(1) Two recent news' }, { zh: '(2) 公司歷史', en: '(2) Company History' }, { zh: '(3) 願景、使命與價值觀', en: '(3) Vision, Mission, and Values' }, { zh: '(4) 組織架構與管理團隊', en: '(4) Organizational Structure and Management Team' }, { zh: '(5) 產品組合與藍圖', en: '(5) Product Portfolios' }, { zh: '(6) 2021-2025 財務績效', en: '(6) Financial Performance during 2021-2025' }] }
+    ] 
+  },
+  { 
+    id: 8, 
+    title: { zh: '第 8 週', en: 'Week 8' }, 
+    topic: { zh: '最小可行性產品 (MVP)', en: 'Minimum Viable Product (MVP)' }, 
+    date: '2026/04/13', 
+    tags: ['ent'], 
+    details: [
+      { id: 'w8-d1', text: { zh: '[ENT-4] 市場、需求尋找與規劃', en: '[ENT-4] Markets, Need-Finding, and Planning (Group 5&6; BA for Others)' }, subtopics: [{ zh: 'Video 3.1~3.7 (88 分鐘)', en: 'Video 3.1~3.7 (88 minutes)' }] },
+      { id: 'w8-d2', text: { zh: '[LN-6] 智慧資本、核心能力、互補資產與動態能力', en: '[LN-6] Intellectual Capital, Core Competencies, Complementary Assets, and Dynamic Capabilities (Group 7&8; BA for Others)' } }
+    ] 
+  },
+  { 
+    id: 9, 
+    title: { zh: '第 9 週', en: 'Week 9' }, 
+    topic: { zh: '技術-產品-市場適配 (T-PMF)', en: 'Tech-Product-Market Fit (T-PMF)' }, 
+    date: '2026/04/20', 
+    tags: ['now', 'ent'], 
+    details: [
+      { id: 'w9-d1', text: { zh: '[ENT-5] 提案、測試與原型製作', en: '[ENT-5] Pitching, Testing, and Prototyping (Group 1&2; BA for Others)' }, subtopics: [{ zh: 'Video 4.1~4.7 (74 分鐘)', en: 'Video 4.1~4.7 (74 minutes)' }] },
+      { id: 'w9-d2', text: { zh: '[LN-7 & LN-8] 競爭優勢與創新管理', en: '[LN-7 & LN-8] (Group 3&4; BA for Others)' }, subtopics: [{ zh: 'LN7 - 競爭優勢與一般策略', en: 'LN7-Competitive Advantages & Generic Strategies' }, { zh: 'LN8 - 科技、創新與創業管理', en: 'LN8-Management of Technology, Innovation and Entrepreneurship' }] }
+    ] 
+  },
+  { id: 10, title: { zh: '第 10 週', en: 'Week 10' }, topic: { zh: '[TP1&2] TP 進度報告 1&2', en: '[TP1&2] TP Progress Report 1&2' }, date: '2026/04/27', tags: ['tp'], details: [] },
+  { id: 11, title: { zh: '第 11 週', en: 'Week 11' }, topic: { zh: '企業成長策略', en: 'Corporate Growth Strategy' }, date: '2026/05/04', tags: ['cs'], details: [] },
+  { id: 12, title: { zh: '第 12 週', en: 'Week 12' }, topic: { zh: '交易成本經濟學 (TCE)', en: 'Transaction Cost Economics (TCE)' }, date: '2026/05/11', tags: ['cs'], details: [] },
+  { id: 13, title: { zh: '第 13 週', en: 'Week 13' }, topic: { zh: '全球化', en: 'Globalization' }, date: '2026/05/18', tags: ['cs'], details: [] },
+  { id: 14, title: { zh: '第 14 週', en: 'Week 14' }, topic: { zh: '[TP3] TP 進度報告 3', en: '[TP3] TP Progress Report 3' }, date: '2026/05/25', tags: ['tp'], details: [] },
+  { id: 15, title: { zh: '第 15 週', en: 'Week 15' }, topic: { zh: '[TP Final] 期末準備', en: '[TP Final] Preparation' }, date: '2026/06/01', tags: ['tp'], details: [] },
+  { id: 16, title: { zh: '第 16 週', en: 'Week 16' }, topic: { zh: '[TP Final] 線上影片競賽', en: '[TP Final] Online Video Competition' }, date: '2026/06/08', tags: ['tp'], details: [] },
+  { id: 17, title: { zh: '第 17-18 週', en: 'Week 17-18' }, topic: { zh: '自主學習 (SDL)', en: 'Self-Directed Learning (SDL)' }, date: '2026/06/15', tags: ['sdl'], details: [] },
+];
+
+const initialNotes = [
+  { id: 1, weekId: 1, type: 'info', content: { zh: '歡迎選修 1142 SMMC-EMI！請記得填寫個人及小組資料表。', en: 'Welcome to 1142 SMMC-EMI! Remember to fill out the forms.' }, author: 'Prof. Lo', timestamp: '2026-02-24 10:00', color: 'bg-yellow-200', rotation: '-rotate-2' },
+  { id: 4, weekId: 3, type: 'alert', content: { zh: '強烈建議大家先去註冊 104 人力銀行與 LinkedIn 帳號！', en: 'Strongly recommend registering for 104 Job Bank and LinkedIn accounts ASAP!' }, author: 'Prof. Lo', timestamp: '2026-03-10 09:00', color: 'bg-green-200', rotation: 'rotate-2' },
+  { id: 5, weekId: 4, type: 'alert', content: { zh: '下周有邀請2位學姊到課堂分享', en: 'We have invited 2 alumnae to share their experiences in class next week.' }, author: 'TA (Tina Wang)', timestamp: '2026-03-17 14:00', color: 'bg-red-200', rotation: '-rotate-1' },
+  
+  // W5 原本的預習便利貼
+  { id: 6, weekId: 5, type: 'homework', content: { zh: '請同學預習 W6 課程內容，下週課堂使用。', en: 'Please preview the materials for W6, which will be used in class next week.' }, author: 'TA (Tina)', timestamp: '2026-03-24 10:00', color: 'bg-purple-200', rotation: 'rotate-1' },
+  // W5 新增的獨立「網頁預覽」便利貼
+  { 
+    id: 61, 
+    weekId: 5, 
+    type: 'info', 
+    content: { zh: 'W5 課前任務', en: 'W5 Pre-class Task' }, 
+    previewUrl: 'https://ncnulolotas.github.io/1142smmc.preclass.notif/W5.1', // 網頁預覽連結
+    author: 'Prof. Lo', 
+    timestamp: '2026-03-24 10:30', 
+    color: 'bg-yellow-200', 
+    rotation: '-rotate-1' 
+  },
+  
+  { id: 7, weekId: 6, type: 'homework', content: { zh: '可以上傳 W4-W6 SPA 自學 CSV 檔案到 W7 作為 BA 加分作業 期限4/5午夜', en: 'You can upload the W4-W6 SPA self-study CSV file to W7 for BA bonus. Deadline: 4/5 Midnight.' }, author: 'Prof. Lo', timestamp: '2026-03-31 09:00', color: 'bg-yellow-200', rotation: '-rotate-1' },
+  { id: 8, weekId: 6, type: 'homework', content: { zh: 'TP0 SPA請根據Moodle要求製作，繳交至 W7 期限4/5午夜', en: 'Submit [TP0] SPA to W7 according to Moodle rules. Deadline: 4/5 Midnight.' }, author: 'TA (Tina Lin)', timestamp: '2026-03-31 10:30', color: 'bg-blue-200', rotation: 'rotate-2' },
+  { id: 9, weekId: 6, type: 'alert', content: { zh: '下周一 (4/6) 適逢清明連假，放假一次！', en: 'Next Monday (April 6th) is off for Tomb-Sweeping Day!' }, author: 'Prof. Lo', timestamp: '2026-03-31 13:00', color: 'bg-red-200', rotation: '-rotate-2' },
+];
+
+const NOTE_COLORS = ['bg-yellow-200', 'bg-pink-200', 'bg-blue-200', 'bg-green-200', 'bg-purple-200'];
+const NOTE_ROTATIONS = ['-rotate-2', '-rotate-1', 'rotate-0', 'rotate-1', 'rotate-2'];
+const NOTE_TYPES = [
+  { value: 'info', label: { zh: '一般公告', en: 'Info' }, icon: MessageSquare },
+  { value: 'homework', label: { zh: '作業/預習', en: 'Homework' }, icon: BookOpen },
+  { value: 'material', label: { zh: '補充資料', en: 'Material' }, icon: Clock },
+  { value: 'alert', label: { zh: '重要通知', en: 'Alert' }, icon: AlertCircle },
+];
+
+export default function App() {
+  const [lang, setLang] = useState('zh');
+  const t = translations[lang];
+
+  // 核心邏輯：判斷目前週次與劃分過去/未來
+  const currentWeekId = initialWeeks.find(w => w.tags.includes('now'))?.id || 1;
+  const [activeWeek, setActiveWeek] = useState(currentWeekId);
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  
+  const [notes, setNotes] = useState(initialNotes);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSyllabus, setShowSyllabus] = useState(true);
+  const [noteToDelete, setNoteToDelete] = useState(null);
+  const scrollContainerRef = useRef(null);
+
+  const pastWeeks = initialWeeks.filter(w => w.id < currentWeekId);
+  const upcomingWeeks = initialWeeks.filter(w => w.id >= currentWeekId);
+
+  const [newNote, setNewNote] = useState({ type: 'info', content: '', author: 'Prof. Lo' });
+
+  useEffect(() => {
+    const activeElement = document.getElementById(`week-tab-${activeWeek}`);
+    if (activeElement && scrollContainerRef.current) {
+      activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [activeWeek]);
+
+  const activeWeekData = initialWeeks.find(w => w.id === activeWeek);
+  const currentWeekNotes = notes.filter(n => n.weekId === activeWeek);
+
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    if (!newNote.content.trim()) return;
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const noteToAdd = {
+      id: Date.now(),
+      weekId: activeWeek,
+      ...newNote,
+      content: { zh: newNote.content, en: newNote.content },
+      timestamp,
+      color: NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)],
+      rotation: NOTE_ROTATIONS[Math.floor(Math.random() * NOTE_ROTATIONS.length)]
+    };
+    setNotes([...notes, noteToAdd]);
+    setIsModalOpen(false);
+    setNewNote({ type: 'info', content: '', author: 'Prof. Lo' });
+  };
+
+  const handleDeleteNote = (id) => setNoteToDelete(id);
+  const confirmDelete = () => {
+    setNotes(notes.filter(n => n.id !== noteToDelete));
+    setNoteToDelete(null);
+  };
+
+  const getNoteTypeIcon = (type) => {
+    const typeData = NOTE_TYPES.find(t => t.value === type);
+    const Icon = typeData ? typeData.icon : MessageSquare;
+    return <Icon size={16} className="mr-1" />;
+  };
+
+  const getText = (obj) => typeof obj === 'string' ? obj : (obj[lang] || obj.zh || '');
+
+  const renderTag = (tag, idx) => {
+    const tagStyles = {
+      tp: "border-yellow-400 bg-yellow-50 text-yellow-700",
+      ent: "border-blue-400 bg-blue-50 text-blue-700",
+      cs: "border-green-400 bg-green-50 text-green-700",
+      peer: "border-red-400 bg-red-50 text-red-700",
+      sdl: "border-purple-400 bg-purple-50 text-purple-700",
+      now: "bg-green-500 text-white border-green-500"
+    };
+    const labels = { tp: "Term Project", ent: "ENT", cs: "CS", peer: "Peer Review", sdl: "SDL", now: t.tagNow };
+    if (!tagStyles[tag]) return null;
+    return <span key={idx} className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ml-2 ${tagStyles[tag]}`}>{labels[tag]}</span>;
+  };
+
+  // 處理便利貼內容中的連結，使其可點擊
+  const renderNoteContentWithLinks = (contentStr) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = contentStr.split(urlRegex);
+    
+    return parts.map((part, i) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a key={i} href={part} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 underline break-all inline-flex items-center gap-1">
+            {part} <ExternalLink size={12} className="inline" />
+          </a>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+      {/* 頂部導覽列 */}
+      <header className="bg-white shadow-sm border-b border-slate-200 py-3 px-4 md:px-6 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="bg-slate-900 p-2 rounded-lg text-green-400 shadow-md"><span className="font-bold font-mono text-lg leading-none">SMMC</span></div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">{t.courseName}</h1>
+              <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-500">
+                <span className="font-mono bg-slate-100 border px-2 py-0.5 rounded">1142 · Spring 2026</span>
+                <span>{t.teacher}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+             <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="text-slate-500 hover:text-slate-800 p-2 text-sm font-mono border border-slate-200 rounded transition-colors bg-white hover:bg-slate-50">
+                <i className="fas fa-language mr-1"></i> {t.langBtn}
+             </button>
+            <button onClick={() => setIsModalOpen(true)} className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-md font-medium transition-all shadow-sm text-sm whitespace-nowrap">
+              <Plus size={16} /> {t.addNoticeBtn}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* 週次選擇器 (漢堡複習選單) */}
+      <div className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-[95px] md:top-[76px] z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-2 py-2 flex items-center gap-2">
+          <div className="relative">
+            <button 
+              onClick={() => setIsArchiveOpen(!isArchiveOpen)}
+              className={`flex-shrink-0 p-3 rounded-lg border transition-all flex items-center gap-2 
+                ${isArchiveOpen ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200'}`}
+            >
+              <Menu size={20} />
+              <span className="text-xs font-bold hidden sm:inline">{t.archiveBtn}</span>
+            </button>
+            {isArchiveOpen && (
+              <div className="absolute top-full left-0 mt-2 w-64 bg-white shadow-2xl rounded-xl border border-slate-200 overflow-hidden z-50">
+                <div className="bg-slate-50 p-3 border-b flex justify-between items-center text-xs font-bold text-slate-500"><History size={14}/> HISTORY</div>
+                <div className="max-h-80 overflow-y-auto">
+                  {pastWeeks.map(week => (
+                    <button key={week.id} onClick={() => { setActiveWeek(week.id); setIsArchiveOpen(false); }} className={`w-full text-left p-3 hover:bg-blue-50 border-b border-slate-100 ${activeWeek === week.id ? 'bg-blue-50' : ''}`}>
+                      <span className="text-[10px] font-mono text-slate-400">{week.date}</span>
+                      <div className="text-sm font-bold text-slate-700">W{week.id} {getText(week.topic)}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="w-px h-8 bg-slate-200 mx-1"></div>
+          <div ref={scrollContainerRef} className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 pt-1 px-1 snap-x scroll-smooth flex-1">
+            {upcomingWeeks.map((week) => (
+              <button key={week.id} id={`week-tab-${week.id}`} onClick={() => setActiveWeek(week.id)} className={`flex-shrink-0 snap-center rounded-lg px-4 py-2 text-left transition-all border ${activeWeek === week.id ? 'border-green-500 bg-green-50 shadow-sm ring-1 ring-green-500' : week.id === currentWeekId ? 'border-slate-300 bg-white hover:border-green-400' : 'border-transparent bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-600'}`}>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className={`text-xs font-mono font-bold ${activeWeek === week.id || week.id === currentWeekId ? 'text-green-600' : 'text-slate-400'}`}>{week.id === 17 ? 'W17-18' : `W${week.id}`}</div>
+                  <div className="flex gap-1">{week.tags.includes('now') && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>}{week.tags.includes('tp') && <div className="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>}{week.tags.includes('ent') && <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>}</div>
+                </div>
+                <div className="text-sm font-semibold truncate w-32 md:w-40 text-slate-800">{getText(week.topic)}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 主要內容區 */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-6 py-6 relative flex flex-col lg:flex-row gap-8 items-start">
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+        
+        {/* 左側：課綱 Syllabus */}
+        <div className="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 lg:sticky lg:top-[160px]">
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-100" onClick={() => setShowSyllabus(!showSyllabus)}>
+              <div>
+                <h3 className="font-mono text-xs text-slate-500 mb-1 tracking-wider uppercase">{t.syllabusTitle}</h3>
+                <div className="font-bold text-lg flex items-center flex-wrap gap-y-1">{activeWeekData.id === 17 ? 'W17-18' : getText(activeWeekData.title)}{activeWeekData.tags.map((tag, idx) => renderTag(tag, idx))}</div>
+              </div>
+              {showSyllabus ? <ChevronUp size={20} className="text-slate-400"/> : <ChevronDown size={20} className="text-slate-400"/>}
+            </div>
+            {showSyllabus && (
+              <div className="p-5 max-h-[50vh] lg:max-h-[65vh] overflow-y-auto">
+                <h4 className="font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100 flex items-start gap-2 leading-snug"><Book className="text-green-600 mt-0.5 flex-shrink-0" size={18} /><span>{getText(activeWeekData.topic)}</span></h4>
+                {activeWeekData.details && activeWeekData.details.length > 0 ? (
+                  <ul className="space-y-4">
+                    {activeWeekData.details.map((detail) => (
+                      <li key={detail.id} className="flex items-start gap-3 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1.5"></div>
+                        <div className="flex-1">
+                          <span className="text-slate-800 leading-relaxed">{getText(detail.text)}</span>
+                          {detail.note && getText(detail.note) && <span className="ml-2 inline-block font-mono text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">{getText(detail.note)}</span>}
+                          {detail.links && <div className="mt-1 flex flex-wrap gap-2">{detail.links.map((link, lidx) => (<a key={lidx} href={link.url} target="_blank" className="inline-flex items-center gap-1 font-mono text-[11px] text-green-600 hover:underline">{link.label} <ExternalLink size={10} /></a>))}</div>}
+                          {detail.subtopics && <ul className="mt-1.5 pl-3 border-l-2 border-slate-100 space-y-1">{detail.subtopics.map((sub, sidx) => (<li key={sidx} className="text-slate-500 text-[13px] flex items-start gap-2"><span className="text-slate-300 mt-0.5">—</span>{getText(sub)}</li>))}</ul>}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : <div className="text-center py-6 text-slate-400 text-xs font-mono uppercase"><p>{t.contentLocked}</p></div>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 右側：便利貼佈告欄 */}
+        <div className="w-full lg:w-2/3 relative z-10">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2 mb-6"><MessageSquare className="text-blue-500" size={24} />{t.boardTitle}</h2>
+          {currentWeekNotes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white/50 rounded-2xl border-2 border-dashed border-slate-200"><MessageSquare size={48} className="mb-4 opacity-30" /><p className="text-lg">{t.emptyBoardTitle}</p></div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start pb-10">
+              {currentWeekNotes.map((note) => (
+                <div key={note.id} className={`${note.color} ${note.rotation} group relative rounded-sm p-5 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:rotate-0`} style={{ boxShadow: '3px 4px 10px rgba(0,0,0,0.08)', borderBottomRightRadius: '20px 20px' }}>
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-red-500/80 drop-shadow-sm z-10"><Pin size={24} className="fill-red-500/50" /></div>
+                  <button onClick={() => handleDeleteNote(note.id)} className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-600 p-1.5 rounded-full bg-white/50 transition-opacity"><Trash2 size={14} /></button>
+                  <div className="flex items-center text-xs font-semibold uppercase tracking-wider text-black/40 mb-3 mt-2">{getNoteTypeIcon(note.type)}{NOTE_TYPES.find(type => type.value === note.type)?.label[lang]}</div>
+                  
+                  <p className="text-slate-800 text-base leading-relaxed whitespace-pre-wrap font-medium min-h-[40px]">
+                    {renderNoteContentWithLinks(getText(note.content))}
+                  </p>
+
+                  {/* 網頁預覽 Iframe 區塊 */}
+                  {note.previewUrl && (
+                    <div className="mt-3 w-full h-48 border border-black/10 rounded-md overflow-hidden relative shadow-inner bg-slate-50">
+                      <iframe 
+                        src={note.previewUrl} 
+                        className="w-full h-full border-0 pointer-events-auto"
+                        title="Webpage Preview"
+                      />
+                      <a 
+                        href={note.previewUrl} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="absolute bottom-2 right-2 bg-slate-800/80 text-white p-1.5 rounded-full hover:bg-slate-900 transition-colors shadow-sm backdrop-blur-sm"
+                        title="Open in new tab"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-3 border-t border-black/10 flex justify-between items-center text-xs text-black/50"><span className="font-bold flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-black/10 flex items-center justify-center text-[8px]">{getText(note.author).charAt(0)}</div>{getText(note.author)}</span><span className="font-mono text-[10px]">{note.timestamp.split(' ')[0]}</span></div>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-black/5 rounded-tl-full blur-sm"></div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* 新增 Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><MessageSquare className="text-blue-500" size={20}/>{t.modalAddTitle.replace('{week}', activeWeek)}</h3>
+            <form onSubmit={handleAddNote} className="space-y-4">
+              <div><label className="block text-sm font-semibold mb-1">{t.noteTypeLabel}</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {NOTE_TYPES.map(type => (
+                    <button key={type.value} type="button" onClick={() => setNewNote({...newNote, type: type.value})} className={`flex items-center justify-center gap-2 py-2 rounded-lg border text-xs transition-all ${newNote.type === type.value ? 'bg-blue-50 border-blue-500 text-blue-700 ring-1' : 'bg-white'}`}>{type.label[lang]}</button>
+                  ))}
+                </div>
+              </div>
+              <div><label className="block text-sm font-semibold mb-1">{t.contentLabel}</label>
+                <textarea required value={newNote.content} onChange={(e) => setNewNote({...newNote, content: e.target.value})} className="w-full border rounded-lg p-3 min-h-[120px] text-sm bg-slate-50 focus:bg-white transition-colors" placeholder={t.contentPlaceholder}></textarea>
+              </div>
+              <div className="flex gap-3 pt-4"><button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 border py-2.5 rounded-xl text-sm font-medium">{t.cancelBtn}</button><button type="submit" className="flex-1 bg-slate-900 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-slate-800">{t.submitBtn}</button></div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 刪除確認 Modal */}
+      {noteToDelete !== null && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 text-center text-sm">
+            <AlertCircle className="text-red-500 mx-auto mb-3" size={32} />
+            <h3 className="text-xl font-bold mb-2">{t.confirmDelTitle}</h3>
+            <p className="text-slate-500 mb-6">{t.confirmDelDesc}</p>
+            <div className="flex gap-3"><button onClick={() => setNoteToDelete(null)} className="flex-1 border py-2.5 rounded-xl">{t.cancelBtn}</button><button onClick={confirmDelete} className="flex-1 bg-red-500 text-white py-2.5 rounded-xl hover:bg-red-600 transition-colors shadow-md">{t.confirmDelBtn}</button></div>
+          </div>
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{__html: `.hide-scrollbar::-webkit-scrollbar { display: none; }`}} />
+    </div>
+  );
+}
